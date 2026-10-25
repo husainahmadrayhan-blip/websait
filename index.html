@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manobotar Feriwala - User Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
+
+  <!-- External CSS Link -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <h3 id="loadingText" style="font-size: 16px; font-weight: bold;">তথ্য খোজা হচ্ছে...</h3>
+    <p style="font-size: 13px; color: #cbd5e1; margin-top: 4px;">দয়া করে একটু অপেক্ষা করুন...</p>
+  </div>
+
+  <header class="top-menubar" id="topHeader" style="display: none;">
+    <div class="menu-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+      <span id="topHeaderTitle">হোম</span>
+    </div>
+    <div class="menu-right">
+      <span class="balance-badge" id="userBalanceDisplay">ব্যালেন্স: 0 টাকা</span>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Manobotar Feriwala</div>
+      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="service-item" onclick="selectService('হোম')"><span class="badge-num"></span><span>হোম পেজ</span></div>
+    <div class="service-item" onclick="selectService('অটো পেমেন্ট')"><span class="badge-num"></span><span>অটো পেমেন্ট (Auto Payment)</span></div>
+
+    <div class="sidebar-title">সার্ভিস তালিকা</div>
+    <div class="service-list">
+      <div class="service-item" onclick="selectService('সাইন কপি টু এনআইডি')"><span class="badge-num">01</span><span>সাইন কপি টু এনআইডি</span></div>
+      <div class="service-item" onclick="selectService('জন্ম নিবন্ধন মেক')"><span class="badge-num">02</span><span>জন্ম নিবন্ধন মেক</span></div>
+      <div class="service-item" onclick="selectService('সার্ভার কপি')"><span class="badge-num">03</span><span>সার্ভার কপি</span></div>
+      <div class="service-item" onclick="selectService('এনআইডি ম্যানুয়াল')"><span class="badge-num">04</span><span>এনআইডি ম্যানুয়াল</span></div>
+      <div class="service-item" onclick="alert('এই অপশনটিতে এখনো কাজ করা হয়নি!')"><span class="badge-num">05</span><span>সাইন কপি টু সার্ভার কপি</span></div>
+      <div class="service-item" onclick="selectService('জন্ম নিবন্ধন হিস্টোরি')"><span class="badge-num">06</span><span>জন্ম নিবন্ধন হিস্টোরি</span></div>
+      <div class="service-item" onclick="selectService('এনআইডি হিস্টোরি')"><span class="badge-num">07</span><span>এনআইডি হিস্টোরি</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-info" id="sidebarUserEmail">ইউজার user@gmail.com</div>
+      <button class="logout-btn" onclick="handleLogout()">🚪 লগআউট</button>
+    </div>
+  </aside>
+
+  <div class="auth-container" id="loginBox">
+    <div class="auth-card">
+      <h2>ইউজার লগইন</h2>
+      <p class="sub-title">ইমেইল / ইউজার আইডি ও পাসওয়ার্ড দিয়ে লগইন করুন</p>
+      <form onsubmit="handleLogin(event)">
+        <input type="text" id="loginEmail" placeholder="ইমেইল এড্রেস অথবা ইউজার আইডি" required value="user@gmail.com">
+        <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" required value="123456">
+        <button type="submit">লগইন</button>
+      </form>
+      <div class="auth-toggle">একাউন্ট নেই? <span onclick="showRegister()">রেজিস্ট্রেশন করুন</span></div>
+    </div>
+  </div>
+
+  <div class="auth-container" id="registerBox" style="display: none;">
+    <div class="auth-card">
+      <h2>ইউজার রেজিস্ট্রেশন</h2>
+      <p class="sub-title">নতুন ইউজার একাউন্ট তৈরি করুন</p>
+      <form onsubmit="handleRegister(event)">
+        <input type="text" id="regUser" placeholder="পূর্ণ নাম" required>
+        <input type="email" id="regEmail" placeholder="ইমেইল এড্রেস" required>
+        <input type="password" id="regPass" placeholder="পাসওয়ার্ড" required>
+        <button type="submit" style="background: #10b981;">রেজিস্ট্রেশন করুন</button>
+      </form>
+      <div class="auth-toggle">আগের একাউন্ট আছে? <span onclick="showLogin()">লগইন করুন</span></div>
+    </div>
+  </div>
+
+  <div class="main-container" id="mainContent">
+    <div class="welcome-banner">
+      <h1>Manobotar Feriwala</h1>
+      <p>মেনু বার থেকে সার্ভিসগুলো দেখে নিন</p>
+    </div>
+
+    <!-- Auto Payment Option Form Box -->
+    <div class="card-box form-panel-wrapper" id="autoPaymentFormBox">
+      <div class="card-title">অটো পেমেন্ট মেথড (Add Balance)</div>
+      
+      <div class="payment-info-box">
+        <p style="font-weight: bold; color: #1e40af; margin-bottom: 6px;">পেমেন্ট ইন্সট্রাকশন:</p>
+        <p style="margin-bottom: 6px;">নিচের যেকোনো নাম্বারে 'Only bKash Payment' করুন:</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-weight: bold; color: #0f172a; background: #ffffff; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px;">
+          <div>📱 বিকাশ (bKash Payment): <span id="adminBkashNo" style="color:#2563eb;">01712345678</span></div>
+        </div>
+        <p style="font-size: 12px; color: #d97706; margin-top: 8px; font-weight: bold;">⚠️ টাকা পাঠানোর পর Transaction ID, Sender Number এবং Screenshot দিয়ে সাবমিট করুন। ৫ মিনিটের মধ্যে অটোমেটিক ব্যালেন্স যোগ হয়ে যাবে!</p>
+      </div>
+
+      <form id="autoPaymentForm" onsubmit="handlePaymentSubmit(event)">
+        <div class="form-group">
+          <label>পেমেন্ট মেথড সিলেক্ট করুন <span>*</span></label>
+          <select id="payMethod" required>
+            <option value="bKash">bKash (বিকাশ)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>যে নাম্বার থেকে টাকা পাঠিয়েছেন (Sender Mobile) <span>*</span></label><input type="text" id="paySenderNo" required placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>টাকার পরিমাণ (Amount) <span>*</span></label><input type="number" id="payAmount" required placeholder="উদাহরণ: 500"></div>
+        <div class="form-group"><label>ট্রানজেকশন আইডি (Transaction ID) <span>*</span></label><input type="text" id="payTrxId" required placeholder="TrxID (যেমন: TRX1234567)"></div>
+        <div class="form-group"><label>পেমেন্ট স্ক্রিনশট (Screenshot) <span>*</span></label><input type="file" id="payScreenshotFile" accept="image/*" required style="width: 100%;"></div>
+
+        <button type="submit" class="btn-submit" style="background: #10b981; margin-top: 6px;">পেমেন্ট সাবমিট করুন</button>
+      </form>
+    </div>
+
+    <!-- Auto Payment History Table Box -->
+    <div class="table-container" id="paymentHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">পেমেন্ট হিস্টোরি (Payment History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>মেথড / নাম্বার</th>
+            <th>পরিমাণ</th>
+            <th>TrxID</th>
+            <th>স্ট্যাটাস / সময়</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="paymentHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Birth Registration Form Box -->
+    <div class="card-box form-panel-wrapper" id="birthRegistrationFormBox">
+      <div class="card-title">জন্ম নিবন্ধন অনলাইন ফরম</div>
+      <form id="birthRegForm" onsubmit="handleBirthRegistrationSubmit(event)">
+        
+        <!-- নতুন যুক্ত করা PDF আপলোড বক্স -->
+        <div style="border: 2px dashed #cbd5e1; background: #f8fafc; padding: 14px; border-radius: 10px; text-align: center; margin-bottom: 14px;">
+          <div style="font-size: 24px; margin-bottom: 4px;">📄</div>
+          <p style="font-size: 14px; color: #1e293b; font-weight: bold; margin-bottom: 6px;">জন্ম নিবন্ধন PDF ফাইল আপলোড করুন</p>
+          <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">যেকোনো জন্ম নিবন্ধনের PDF নির্বাচন করুন:</p>
+          <input type="file" id="birthPdfFile" accept=".pdf" onchange="handleBirthPdfAutoFill(event)" style="width: 100%; max-width: 100%;">
+        </div>
+
+        <div class="form-group"><label>Register Office Address</label><input type="text" id="brOfficeAddress" placeholder="রেজিস্টার অফিসের ঠিকানা"></div>
+        <div class="form-group"><label>Upazila/Pourashava/City Corporation, Zila</label><input type="text" id="brUpazilaZila" placeholder="উপজেলা/পৌরসভা/সিটি কর্পোরেশন, জেলা"></div>
+        <div class="form-group"><label>Birth Registration Number</label><input type="text" id="brRegNo" placeholder="XXXXXXXXXXXXX"></div>
+        <div class="form-group"><label>Gender</label><select id="brGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+        <div class="form-group"><label>Date of Registration</label><input type="text" id="brDateReg" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Date of Issuance</label><input type="text" id="brDateIssue" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Left Bar Code</label><input type="text" id="brLeftBarCode" placeholder="QZIP (আপনি চাইলে নিজেও লিখতে পারেন)"></div>
+        <div class="form-group"><label>QR Link</label><input type="text" id="brQrLink" placeholder="certificate/verify?key=..."></div>
+        <div class="form-group"><label>Date of Birth</label><input type="text" id="brDob" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Date of Birth in Word</label><input type="text" id="brDobInWord" placeholder="Eleventh August two thousand three"></div>
+        <div class="form-group"><label>নাম</label><input type="text" id="brNameBn" placeholder="সম্পূর্ণ নাম বাংলায়"></div>
+        <div class="form-group"><label>Name</label><input type="text" id="brNameEn" placeholder="Full Name in English"></div>
+        <div class="form-group"><label>পিতার নাম</label><input type="text" id="brFatherBn" placeholder="পিতার নাম বাংলায়"></div>
+        <div class="form-group"><label>Father Name</label><input type="text" id="brFatherEn" placeholder="Father Name in English"></div>
+        <div class="form-group"><label>পিতার জাতীয়তা</label><input type="text" id="brFatherNatBn" value="বাংলাদেশী"></div>
+        <div class="form-group"><label>Father Nationality</label><input type="text" id="brFatherNatEn" value="Bangladeshi"></div>
+        <div class="form-group"><label>মাতার নাম</label><input type="text" id="brMotherBn" placeholder="মাতার নাম বাংলায়"></div>
+        <div class="form-group"><label>Mother Name</label><input type="text" id="brMotherEn" placeholder="Mother Name in English"></div>
+        <div class="form-group"><label>মাতার জাতীয়তা</label><input type="text" id="brMotherNatBn" value="বাংলাদেশী"></div>
+        <div class="form-group"><label>Mother Nationality</label><input type="text" id="brMotherNatEn" value="Bangladeshi"></div>
+        <div class="form-group"><label>জন্মস্থান</label><input type="text" id="brBirthPlaceBn" placeholder="জন্মস্থান বাংলায়"></div>
+        <div class="form-group"><label>Place of Birth</label><input type="text" id="brBirthPlaceEn" placeholder="Place of Birth in English"></div>
+        <div class="form-group"><label>স্থায়ী ঠিকানা</label><textarea id="brAddressBn" rows="2" placeholder="স্থায়ী ঠিকানা বাংলায়"></textarea></div>
+        <div class="form-group"><label>Permanent Address</label><textarea id="brAddressEn" rows="2" placeholder="Permanent Address in English"></textarea></div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-top: 12px; margin-bottom: 10px;">
+          আপনার একাউন্ট থেকে ৩ টাকা কাটা হবে।
+        </div>
+        <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
+          জন্মনিবন্ধন সার্টিফিকেট তৈরি করার সময় যদি কিছু না আসে তাহলে সেগুলো নিজে পূরণ করে নিবেন।
+        </div>
+
+        <button type="submit" class="btn-submit" style="background: #3b82f6;">ডাউনলোড করুন</button>
+      </form>
+    </div>
+
+    <!-- Birth Registration History Table Box -->
+    <div class="table-container" id="birthHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">জন্ম নিবন্ধন হিস্টোরি (Birth Registration History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>নাম (Name)</th>
+            <th>জন্ম নিবন্ধন নম্বর (Reg No)</th>
+            <th>জন্ম তারিখ (DOB)</th>
+            <th>অ্যাকশন (Print & Edit)</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="birthHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Sign Copy to NID Form Box -->
+    <div class="card-box form-panel-wrapper" id="signCopyFormBox">
+      <form id="scMainForm" onsubmit="handleSignCopySubmit(event)">
+        <div style="border: 2px dashed #cbd5e1; background: #f8fafc; padding: 14px; border-radius: 10px; text-align: center; margin-bottom: 12px;">
+          <div style="font-size: 24px; margin-bottom: 4px;">📄</div>
+          <p style="font-size: 14px; color: #1e293b; font-weight: bold; margin-bottom: 6px;">১. এন.আই.ডি সাইন কপি (PDF / Image) আপলোড করুন</p>
+          
+          <div style="background: #dbeafe; color: #1e40af; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 8px;">
+            ⚡ Python Flask Backend & PyMuPDF Auto-Type Reader
+          </div>
+          <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">যেকোনো PDF নির্বাচন করুন, Python সার্ভার স্বয়ংক্রিয়ভাবে সকল তথ্য ফর্মে সঠিক বাংলা ফন্টে পূরণ করে দিবে:</p>
+          <input type="file" id="pdfFile" accept=".pdf,image/*" onchange="handlePdfAutoFill(event)" style="width: 100%; max-width: 100%;">
+
+          <div class="separate-extract-container">
+            <div class="separate-extract-header">
+              <span>🖼️ PDF Image & Signature Converter (আলাদা ছবি ও স্বাক্ষর)</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <input type="file" id="extractPdfFile" accept=".pdf" onchange="extractPhotoAndSignOnly(event)" style="width: 100%; max-width: 100%;">
+            </div>
+
+            <div class="extract-row" id="extractResultArea" style="display: none;">
+              <p style="font-size: 12px; color: #2563eb; font-weight: bold;">আপনার PDF থেকে ছবি ও স্বাক্ষর আলাদা করে দেওয়া হয়েছে। নিচে দুটোই ডাউনলোড করতে পারবেন।</p>
+              
+              <div class="extract-card">
+                <img id="extPhotoPreview" class="extract-img-thumb" alt="Photo">
+                <div class="extract-info">
+                  <h4>১. ব্যক্তির ছবি (Photo)</h4>
+                  <p>মূল PDF থেকে আলাদা করা হয়েছে।</p>
+                </div>
+                <a id="btnDownloadPhoto" class="extract-btn" download="photo.png">ছবি ডাউনলোড</a>
+              </div>
+
+              <div class="extract-card">
+                <img id="extSignPreview" class="extract-img-thumb" alt="Signature">
+                <div class="extract-info">
+                  <h4>২. স্বাক্ষর (Signature)</h4>
+                  <p>মূল PDF থেকে আলাদা করা হয়েছে।</p>
+                </div>
+                <a id="btnDownloadSign" class="extract-btn" download="signature.png">স্বাক্ষর ডাউনলোড</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 130px; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; background: #f8fafc;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 6px;">📸 ব্যক্তির ছবি</label>
+            <div style="width: 70px; height: 85px; background: #e2e8f0; margin: 0 auto 8px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <img id="scPhotoPreview" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <label style="background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              ⬆ নতুন ছবি আপলোড
+              <input type="file" id="scPhotoFile" accept="image/*" onchange="previewScPhoto(event)" style="display:none;">
+            </label>
+          </div>
+
+          <div style="flex: 1; min-width: 130px; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; background: #f8fafc;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 6px;">✍️ স্বাক্ষর / সিগনেচার</label>
+            <div style="width: 110px; height: 55px; background: #e2e8f0; margin: 0 auto 8px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 11px; color: #64748b;">
+              <span id="signPlaceholderText">সিগনেচার নেই</span>
+              <img id="scSignPreview" alt="" onload="autoFitSignOrThumb(this)" style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;">
+            </div>
+            <label style="background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              ⬆ নতুন সিগনেচার আপলোড
+              <input type="file" id="scSignFile" accept="image/*" onchange="previewScSign(event)" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group"><label>নামঃ (বাংলা) <span>*</span></label><input type="text" id="scNameBn" required placeholder="বাংলা নাম লিখুন"></div>
+        <div class="form-group"><label>নামঃ (ইংরেজি) <span>*</span></label><input type="text" id="scNameEn" required placeholder="English Name"></div>
+        <div class="form-group"><label>আইডি নাম্বারঃ <span>*</span></label><input type="text" id="scIdNo" required placeholder="ID Number"></div>
+        <div class="form-group"><label>পিন নাম্বারঃ <span>*</span></label><input type="text" id="scPinNo" required placeholder="Pin Number"></div>
+        <div class="form-group"><label>পিতার নামঃ <span>*</span></label><input type="text" id="scFatherName" required placeholder="পিতার নাম লিখুন"></div>
+        <div class="form-group"><label>স্বামী অথবা স্ত্রীর নামঃ (ঐচ্ছিক)</label><input type="text" id="scSpouseName" placeholder="স্বামী বা স্ত্রীর নাম (যদি থাকে)"></div>
+        <div class="form-group"><label>মাতার নামঃ <span>*</span></label><input type="text" id="scMotherName" required placeholder="মাতার নাম লিখুন"></div>
+        <div class="form-group"><label>জন্মস্থানঃ <span>*</span></label><input type="text" id="scBirthPlace" required placeholder="জন্ম স্থান লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখঃ <span>*</span></label><input type="text" id="scDob" required placeholder="01 Jan 2001"></div>
+        <div class="form-group"><label>প্রদানের তারিখঃ <span>*</span></label><input type="text" id="scIssueDate" required placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>রক্তের গ্রুপঃ (ঐচ্ছিক)</label><input type="text" id="scBloodGroup" placeholder="A+"></div>
+        <div class="form-group"><label>ঠিকানাঃ <span>*</span> ( সিটি কর্পোরেশন বা পৌরসভা হলে পৌরসভা/সিটি কর্পোরেশনের নাম লিখুন )</label><textarea id="scAddress" rows="2" required placeholder="ঠিকানা লিখুন"></textarea></div>
+        
+        <div style="margin-bottom: 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="sc17DigitCheck" style="width: 16px; height: 16px;">
+          <label for="sc17DigitCheck" style="margin-bottom: 0; font-weight: normal; cursor: pointer;">১৭ ডিজিট পুরাতন কার্ড হলে টিকমার্ক দিন। (টিক দিলে NID নাম্বার ১৭ ডিজিট হবে)</label>
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
+          আপনার একাউন্ট থেকে ২ টাকা কাটা হবে।
+        </div>
+
+        <button type="submit" class="btn-submit">ডাউনলোড করুন</button>
+      </form>
+    </div>
+
+    <!-- Bangla NID Manual Form -->
+    <div class="card-box form-panel-wrapper" id="nidManualFormBox">
+      <div class="card-title">এনআইডি ম্যানুয়াল ফরম</div>
+      <form id="nidForm" onsubmit="handleManualDirectDownload(event)">
+        <div class="form-group"><label>এনআইডি নম্বর (NID) <span>*</span></label><input type="text" id="nidNo" required placeholder="এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>পুরাতন এনআইডি নম্বর (Old NID) <span>*</span></label><input type="text" id="oldNidNo" required placeholder="পুরাতন এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখ (Date of Birth) <span>*</span></label><input type="text" id="dob" required placeholder="জন্ম তারিখ (যেমন: 10 Feb 1956)"></div>
+        <div class="form-group"><label>নাম (বাংলা) <span>*</span></label><input type="text" id="nameBn" required placeholder="বাংলা নাম লিখুন"></div>
+        <div class="form-group"><label>নাম (ইংরেজি) <span>*</span></label><input type="text" id="nameEn" required placeholder="English Name"></div>
+        <div class="form-group"><label>পিতার নাম (বাংলা) <span>*</span></label><input type="text" id="fatherName" required placeholder="পিতার নাম লিখুন"></div>
+        <div class="form-group"><label>মাতার নাম (বাংলা) <span>*</span></label><input type="text" id="motherName" required placeholder="মাতার নাম লিখুন"></div>
+        <div class="form-group"><label>জন্মস্থান (বাংলা) <span>*</span></label><input type="text" id="birthPlace" required placeholder="জন্মস্থান লিখুন"></div>
+        <div class="form-group"><label>প্রদানের তারিখ (Issue Date) <span>*</span></label><input type="text" id="issueDate" required placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>রক্তের গ্রুপ (Blood Group)</label><input type="text" id="bloodGroup" placeholder="A+"></div>
+        <div class="form-group"><label>ঠিকানা (বাংলা) <span>*</span></label><textarea id="address" rows="2" required placeholder="ঠিকানা লিখুন"></textarea></div>
+        <div class="form-group"><label>ছবি আপলোড (Photo)</label><input type="file" id="photoFile" accept="image/*" onchange="previewPhoto(event)" style="width: 100%;"></div>
+        <div class="form-group"><label>স্বাক্ষর আপলোড (Signature)</label><input type="file" id="signFile" accept="image/*" onchange="previewSign(event)" style="width: 100%;"></div>
+        <button type="submit" class="btn-submit">ডাইরেক্ট ডাউনলোড & প্রিন্ট</button>
+      </form>
+    </div>
+
+    <!-- Manual NID Download History Table Box -->
+    <div class="table-container" id="manualHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">ম্যানুয়াল এনআইডি হিস্টোরি (Manual NID Download History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>নাম (Name)</th>
+            <th>এনআইডি (NID)</th>
+            <th>জন্ম তারিখ (DOB)</th>
+            <th>অ্যাকশন (Print & Edit)</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="manualHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Server Copy Request Form -->
+    <div class="card-box form-panel-wrapper" id="serverCopyFormBox">
+      <div class="card-title">সার্ভার কপি আবেদন ফরম</div>
+      <form id="serverCopyForm" onsubmit="handleServerCopyRequest(event)">
+        <div class="form-group"><label>এনআইডি নম্বর <span>*</span></label><input type="text" id="scNidNo" required placeholder="এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখ <span>*</span></label><input type="text" id="reqDob" required placeholder="YYYY-MM-DD"></div>
+        <button type="submit" class="btn-submit" style="background: #2563eb;">ডাউনলোড</button>
+      </form>
+    </div>
+
+    <!-- User Request List Table for Server Copy -->
+    <div class="table-container" id="userTableContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">আবেদন সমূহের তালিকা (Request List)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>এনআইডি</th>
+            <th>জন্ম তারিখ</th>
+            <th>স্ট্যাটাস / সময় / নোট</th>
+            <th>অ্যাকশন</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="userRequestTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Printable Layout (NID) -->
+    <div id="printable-nid-wrapper">
+      <div class="nid-portrait-page">
+        <img class="field-photo" id="out-photo" alt="" style="position: absolute; left: 77px; top: 185px; width: 62px; height: 73px; object-fit: cover; z-index: 2;" src=""> 
+        <img class="field-photo" id="out-sign" alt="" onload="autoFitSignOrThumb(this)" style="position: absolute; left: 77px; top: 250px; width: 62px; height: 50px; object-fit: contain; z-index: 2;" src=""> 
+        <div class="text-block" id="out-nameBn" style="left: 202px; top: 188px; font-size: 13px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-nameEn" style="left: 202px; top: 213.4px; font-size: 12px; font-weight: bold;"></div>
+        <div class="text-block" id="out-fatherName" style="left: 202px; top: 234px; font-size: 12px;"></div>
+        <div class="text-block" id="out-motherName" style="left: 202px; top: 255px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-dob" style="left: 220px; top: 274px; font-size: 12px; color: #ec0b43;"></div>
+        <div class="text-block english-field" id="out-nidNo" style="left: 202px; top: 291.5px; font-size: 12.5px; font-weight: bold; color: #ec0b43;"></div>
+
+        <div class="text-block" id="out-address" style="left: 435px; top: 155px; font-size: 10px; width: 250px; white-space: normal; line-height: 1.25;"></div>
+        <div class="text-block english-field" id="out-bloodGroup" style="left: 498px; top: 208px; font-size: 10px; font-weight: bold; color: #be123c;"></div>
+        <div class="text-block" id="out-birthPlace" style="left: 555px; top: 207.5px; font-size: 09px;"></div>
+        <div class="text-block english-field" id="out-issueDate" style="left: 635px; top: 250.4px; font-size: 10px; font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif;"></div>
+        <canvas id="pdf417-barcode" style="position: absolute; left: 400px; top: 270px; width: 300px; height: 39px; z-index: 2;"></canvas>
+      </div>
+    </div>
+
+    <!-- Printable Layout (Birth Registration Full Output) -->
+    <div id="printable-birth-wrapper">
+      <div class="birth-portrait-page">
+        <!-- Office Address & Upazila with exact left & top alignment -->
+        <div class="text-block english-field" id="out-brOfficeAddress" style="left: 300px; top: 208px; font-size: 15px; width: 275px; text-align: center;"></div>
+        <div class="text-block english-field" id="out-brUpazilaZila" style="left: 300px; top: 230px; font-size: 15px; width: 275px; text-align: center;"></div>
+        <div class="text-block english-field" id="out-brRegNo" style="left: 340px; top: 327px; font-size: 16px; font-weight: bold;"></div>
+
+        <div class="text-block english-field" id="out-brGender" style="left: 585px; top: 372.4px; font-size: 13px;"></div>
+        <div class="text-block english-field" id="out-brDateReg" style="left: 91px; top: 325.9px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-brDateIssue" style="left: 608px; top: 325.9px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-brLeftBarCode" style="left: 117px; top: 214.9px; font-size: 15px;"></div>
+        
+        <div class="text-block english-field" id="out-brDob" style="left: 235px; top: 370.4px; font-size: 14px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-brDobInWord" style="left: 235px; top: 396.4px; font-size: 14px;"></div>
+        
+        <div class="text-block" id="out-brNameBn" style="left: 235px; top: 446.9px; font-size: 14px;"></div>
+        <div class="text-block english-field" id="out-brNameEn" style="left: 570px; top: 448.9px; font-size: 14px;"></div>
+        
+        <div class="text-block" id="out-brFatherBn" style="left: 235px; top: 562.9px; font-size: 15px;"></div>
+        <div class="text-block english-field" id="out-brFatherEn" style="left: 570px; top: 562.9px; font-size: 14px;"></div>
+        <div class="text-block" id="out-brFatherNatBn" style="left: 235px; top: 600.9px; font-size: 15px;"></div>
+        <div class="text-block english-field" id="out-brFatherNatEn" style="left: 570px; top: 600.9px; font-size: 14px;"></div>
+        
+        <div class="text-block" id="out-brMotherBn" style="left: 235px; top: 486.9px; font-size: 14px;"></div>
+        <div class="text-block english-field" id="out-brMotherEn" style="left: 570px; top: 486.9px; font-size: 14px;"></div>
+        <div class="text-block" id="out-brMotherNatBn" style="left: 235px; top: 524.9px; font-size: 15px;"></div>
+        <div class="text-block english-field" id="out-brMotherNatEn" style="left: 570px; top: 524.9px; font-size: 14px;"></div>
+
+        <div class="text-block" id="out-brBirthPlaceBn" style="left: 235px; top: 638.9px; font-size: 15px;"></div>
+        <div class="text-block english-field" id="out-brBirthPlaceEn" style="left: 570px; top: 638.9px; font-size: 14px;"></div>
+        
+        <!-- Address fields with multi-line fix -->
+        <div class="text-block" id="out-brAddressBn" style="left: 235px; top: 691px; font-size: 13px; width: 185px; white-space: normal; line-height: 1.25;"></div>
+        <div class="text-block english-field" id="out-brAddressEn" style="left: 570px; top: 691px; font-size: 13px; width: 220px; white-space: normal; line-height: 1.3;"></div>
+      </div>
+    </div>
+
+  </div> <!-- Main Container Closing -->
+
+  <!-- External JavaScript Link -->
+  <script src="script.js"></script>
+</body>
+</html>
