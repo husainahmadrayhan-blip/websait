@@ -1,0 +1,2291 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manobotar Feriwala - User Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/bwip-js@3.0.4/dist/bwip-js-min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;600;700&family=Tiro+Bangla&display=swap" rel="stylesheet">
+
+  <style>
+    @import url('https://fonts.cdnfonts.com/css/solaimanlipi');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif;
+      background: #f8fafc;
+      min-height: 100vh;
+      color: #0f172a;
+      overflow-x: hidden;
+      font-size: 15px; /* Mobile readability improved */
+    }
+
+    .top-menubar {
+      background: #ffffff; 
+      color: #0f172a; 
+      padding: 12px 16px;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0; 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: relative; 
+      z-index: 10;
+    }
+    
+    .menu-left { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px; 
+      font-size: 18px; 
+      font-weight: bold; 
+      color: #2563eb; 
+    }
+    
+    .hamburger-btn { 
+      font-size: 24px; 
+      cursor: pointer; 
+      background: none; 
+      border: none; 
+      color: #2563eb; 
+      display: flex; 
+      align-items: center; 
+    }
+    
+    .menu-right { 
+      display: flex; 
+      align-items: center; 
+      gap: 10px; 
+      font-size: 14px; 
+    }
+    
+    .balance-badge { 
+      background: #10b981; 
+      color: white; 
+      padding: 6px 14px; 
+      border-radius: 20px; 
+      font-weight: bold; 
+      font-size: 13px; 
+      white-space: nowrap; 
+    }
+
+    .sidebar-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(2px); z-index: 99; opacity: 0; visibility: hidden; transition: all 0.3s ease-in-out;
+    }
+    .sidebar-overlay.active { opacity: 1; visibility: visible; }
+
+    .sidebar-drawer {
+      position: fixed; top: 0; left: -320px; width: 290px; height: 100vh; background: #ffffff;
+      border-right: 1px solid #e2e8f0; box-shadow: 10px 0 30px rgba(0,0,0,0.1); z-index: 100;
+      transition: left 0.3s ease-in-out; display: flex; flex-direction: column; padding: 18px; overflow-y: auto;
+    }
+    .sidebar-drawer.active { left: 0; }
+
+    .sidebar-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #e2e8f0; margin-bottom: 14px; }
+    .sidebar-brand { font-size: 18px; font-weight: bold; color: #2563eb; }
+    .sidebar-close { font-size: 22px; color: #64748b; background: none; border: none; cursor: pointer; }
+    .sidebar-title { font-size: 14px; color: #475569; margin-bottom: 10px; font-weight: bold; }
+
+    .service-list { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+    .service-item {
+      display: flex; align-items: center; background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 8px; padding: 10px 12px; color: #1e293b; font-size: 14px; cursor: pointer; transition: 0.2s;
+    }
+    .service-item:hover { background: #e2e8f0; color: #2563eb; }
+    .badge-num {
+      width: 24px; height: 24px; border-radius: 50%; border: 1px solid #2563eb;
+      color: #2563eb; display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: bold; margin-right: 10px; flex-shrink: 0;
+    }
+
+    .sidebar-footer {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #e2e8f0;
+    }
+    .sidebar-user-info { font-size: 13px; color: #64748b; margin-bottom: 10px; word-break: break-all; }
+    .logout-btn { 
+      width: 100%;
+      background: #ef4444; color: white; padding: 12px; border-radius: 8px; 
+      font-weight: bold; border: none; cursor: pointer; transition: 0.3s; font-size: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .logout-btn:hover { background: #dc2626; }
+
+    .auth-container { display: flex; justify-content: center; align-items: center; min-height: 85vh; padding: 15px; }
+    .auth-card {
+      background: #ffffff; padding: 25px 20px; border-radius: 14px; border: 1px solid #e2e8f0;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 100%; max-width: 400px; text-align: center;
+    }
+    .auth-card h2 { margin-bottom: 8px; color: #1e293b; font-size: 22px; }
+    .auth-card p.sub-title { color: #64748b; font-size: 14px; margin-bottom: 18px; }
+    .auth-card input { width: 100%; padding: 12px 14px; margin-bottom: 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 15px; outline: none; }
+    .auth-card button { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
+    .auth-toggle { margin-top: 16px; font-size: 14px; color: #64748b; }
+    .auth-toggle span { color: #2563eb; font-weight: bold; cursor: pointer; text-decoration: underline; }
+
+    .main-container { padding: 15px 12px; max-width: 900px; margin: 0 auto; display: none; }
+    .welcome-banner { background: #ffffff; padding: 25px 15px; border-radius: 12px; border: 1px solid #e2e8f0; text-align: center; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+    .welcome-banner h1 { font-size: 24px; color: #2563eb; margin-bottom: 8px; }
+    .welcome-banner p { font-size: 14px; color: #64748b; }
+
+    .card-box { background: #ffffff; padding: 18px 15px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 6px 15px rgba(0,0,0,0.04); margin-bottom: 16px; display: none; }
+    .card-box.active { display: block; }
+    .card-title { font-size: 18px; font-weight: bold; text-align: center; margin-bottom: 14px; color: #1e293b; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-weight: bold; margin-bottom: 6px; color: #1e293b; font-size: 14px; }
+    .form-group label span { color: #ef4444; }
+    .form-group input, .form-group textarea, .form-group select { 
+      width: 100%; 
+      padding: 10px 12px; 
+      background: #f8fafc; 
+      border: 1px solid #cbd5e1; 
+      border-radius: 8px; 
+      font-size: 15px; 
+      outline: none; 
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif; 
+    }
+    
+    .btn-submit { width: 100%; background: #2563eb; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+    .btn-submit:hover { background: #1d4ed8; }
+
+    #loadingOverlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 9999;
+      display: none; justify-content: center; align-items: center; flex-direction: column; color: white;
+    }
+    .spinner {
+      width: 42px; height: 42px; border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid #ffffff; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 10px;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    .table-container { background: #ffffff; padding: 15px 10px; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 6px 15px rgba(0,0,0,0.04); display: none; margin-top: 16px; overflow-x: auto; }
+    .table-container.active { display: block; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; text-align: center; font-size: 13px; min-width: 500px; }
+    th, td { border: 1px solid #e2e8f0; padding: 8px 8px; vertical-align: middle; }
+    th { background: #f1f5f9; color: #1e293b; font-weight: bold; font-size: 14px; }
+
+    .action-btn-download { background: #10b981; color: white; border: none; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+    .action-btn-edit { background: #0284c7; color: white; border: none; padding: 6px 8px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; display: inline-block; margin-left: 2px; }
+    .action-btn-edit:hover { background: #0369a1; }
+    .action-btn-pending { background: #f97316; color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; display: inline-block; }
+    .action-btn-cancelled { background: #ef4444; color: white; padding: 6px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; display: inline-block; }
+    .btn-user-delete { background: #e2e8f0; color: #0f172a; border: 1px solid #cbd5e1; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; transition: 0.2s; }
+    .btn-user-delete:hover { background: #ef4444; color: #ffffff; border-color: #ef4444; }
+
+    .payment-info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      font-size: 14px;
+    }
+
+    .separate-extract-container {
+      margin-top: 10px;
+      padding: 10px;
+      background: #ffffff;
+      border: 1px dashed #2563eb;
+      border-radius: 8px;
+    }
+    .separate-extract-header {
+      font-size: 13px;
+      font-weight: bold;
+      color: #1e40af;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .extract-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .extract-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8fafc;
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      flex-wrap: wrap;
+    }
+    .extract-img-thumb {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      background: #ffffff;
+      object-fit: contain;
+      display: block;
+    }
+    .extract-info { flex: 1; text-align: left; min-width: 120px; }
+    .extract-info h4 { font-size: 13px; color: #0f172a; margin-bottom: 2px; }
+    .extract-info p { font-size: 11px; color: #64748b; }
+    .extract-btn {
+      background: #10b981;
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    #printable-nid-wrapper { display: none !important; }
+    #printable-birth-wrapper { display: none !important; }
+
+    .nid-portrait-page { 
+      width: 790px; 
+      height: 1120px; 
+      background: url('nid-bg.jpg') no-repeat center center; 
+      background-size: contain; 
+      position: relative; 
+      color: #000; 
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif;
+      -webkit-print-color-adjust: exact !important; 
+      print-color-adjust: exact !important;
+    }
+
+    .birth-portrait-page { 
+      width: 790px; 
+      height: 1120px; 
+      background: url('birth-bg.jpg') no-repeat center center; 
+      background-size: contain; 
+      position: relative; 
+      color: #000; 
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif;
+      -webkit-print-color-adjust: exact !important; 
+      print-color-adjust: exact !important;
+    }
+
+    .text-block { 
+      position: absolute; 
+      line-height: 1.2; 
+      white-space: nowrap; 
+      z-index: 2; 
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif !important; 
+    }
+    .english-field { font-family: Arial, sans-serif !important; }
+    .english-field#out-issueDate { 
+      font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif !important; 
+    }
+
+    @media (max-width: 768px) {
+      .top-menubar { padding: 10px 12px; }
+      .menu-left span { font-size: 16px; }
+      .main-container { padding: 10px 8px; }
+      .card-box { padding: 15px 12px; }
+      .auth-card { padding: 20px 14px; }
+    }
+
+    @media print {
+      body { background: #fff !important; padding: 0 !important; color: #000 !important; }
+      .top-menubar, .form-panel-wrapper, .table-container, .welcome-banner, .auth-container, .sidebar-drawer, .sidebar-overlay { display: none !important; }
+      
+      #printable-nid-wrapper { display: none !important; }
+      #printable-birth-wrapper { display: none !important; }
+
+      body.printing-nid #printable-nid-wrapper { 
+        display: block !important; 
+        position: fixed !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100vw !important; 
+        height: 100vh !important; 
+        z-index: 999999; 
+        background: #fff !important; 
+      }
+      body.printing-birth #printable-birth-wrapper { 
+        display: block !important; 
+        position: fixed !important; 
+        left: 0 !important; 
+        top: 0 !important; 
+        width: 100vw !important; 
+        height: 100vh !important; 
+        z-index: 999999; 
+        background: #fff !important; 
+      }
+      
+      .nid-portrait-page { 
+        position: relative !important; left: 0 !important; top: 0 !important; 
+        width: 790px !important; height: 1120px !important; margin: 0 auto !important;
+        background: url('nid-bg.jpg') no-repeat center center !important; background-size: contain !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
+      }
+
+      .birth-portrait-page { 
+        position: relative !important; left: 0 !important; top: 0 !important; 
+        width: 790px !important; height: 1120px !important; margin: 0 auto !important;
+        background: url('birth-bg.jpg') no-repeat center center !important; background-size: contain !important;
+        -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; 
+      }
+      @page { size: A4 portrait; margin: 0; }
+    }
+  </style>
+
+<style id="sheba-premium-dark-recovery">
+/* Sheba Computer Academy — Premium Dark recovery theme */
+:root{color-scheme:dark;--bg:#080d18;--panel:#111a2b;--panel2:#172338;--line:#2b3b55;--text:#e8eef9;--muted:#a7b6ce;--accent:#60a5fa;--accent2:#8b5cf6;--success:#34d399;--danger:#fb7185}
+html{background:var(--bg)!important;color-scheme:dark}body{background:radial-gradient(ellipse at top,#15213a 0%,var(--bg) 58%)!important;color:var(--text)!important;font-family:system-ui,'Noto Serif Bengali','SolaimanLipi',sans-serif!important;font-size:15px!important;line-height:1.55!important;min-height:100vh}
+body *{box-sizing:border-box}h1,h2,h3,h4,h5,strong,label,legend,th{color:var(--text)}p,small,.sub-title,.sidebar-title{color:var(--muted)}
+header,.top-menubar,.admin-header,.sidebar-header{background:rgba(15,23,42,.96)!important;color:var(--text)!important;border-color:var(--line)!important}
+.auth-card,.admin-auth-card,.card,.panel,.service-card,.history-card,.preview-card,.upload-card,.modal-content,.content-card,.form-section,.box,.dashboard-card,.stat-card,section,.main-content{background:rgba(17,26,43,.94)!important;color:var(--text)!important;border:1px solid var(--line)!important;border-radius:14px!important;box-shadow:0 12px 32px rgba(0,0,0,.24)!important}
+input,textarea,select,button,input[type=file]::file-selector-button{font:inherit}input:not([type=checkbox]):not([type=radio]),textarea,select{background:#0b1322!important;color:var(--text)!important;border:1px solid #344761!important;border-radius:8px!important;padding:10px 12px!important;max-width:100%}input::placeholder,textarea::placeholder{color:#8495b0!important}input:focus,textarea:focus,select:focus{outline:2px solid #60a5fa!important;outline-offset:1px;border-color:var(--accent)!important}
+button,.btn,.logout-btn,.submit-btn,.primary-btn{background:linear-gradient(135deg,#2563eb,#7c3aed)!important;color:#fff!important;border:1px solid #526de5!important;border-radius:9px!important;padding:9px 14px!important;cursor:pointer!important;font-weight:650!important;transition:transform .15s,filter .15s!important}button:hover,.btn:hover{filter:brightness(1.12)!important;transform:translateY(-1px)}button:disabled{opacity:.5;cursor:not-allowed}
+a{color:#93c5fd!important}table{border-collapse:collapse;width:100%;color:var(--text)}td,th{border-bottom:1px solid var(--line)!important;padding:9px!important}tr:hover{background:#1b2940!important}
+.sidebar-drawer{background:#0e1728!important;color:var(--text)!important;border-color:var(--line)!important}.service-item{background:#121e32!important;color:var(--text)!important;border-color:#293b56!important}.service-item:hover,.service-item.active{background:#203553!important;color:#bfdbfe!important}.sidebar-brand,.menu-left{color:#93c5fd!important}.balance-badge{background:#065f46!important;color:#d1fae5!important}
+#loadingOverlay{background:rgba(5,10,20,.96)!important;color:var(--text)!important}.spinner{border-color:#334155!important;border-top-color:#60a5fa!important}
+.drop-zone,[class*=drop-zone],[class*=upload-area],.upload-area{background:#0c1525!important;color:var(--text)!important;border:1px dashed #466080!important;border-radius:12px!important;padding:18px!important}.notice,.alert,.info-box{background:#132744!important;color:#dbeafe!important;border-color:#31547e!important}.error,.alert-danger{background:#351622!important;color:#fecdd3!important;border-color:#9f1239!important}.success,.alert-success{background:#092b27!important;color:#a7f3d0!important;border-color:#065f46!important}
+hr{border-color:var(--line)!important}img,canvas,svg{max-width:100%}pre,code{background:#080f1c!important;color:#dbeafe!important;border:1px solid var(--line);border-radius:8px;padding:4px}
+@media(max-width:700px){body{font-size:14px!important}.auth-card,.admin-auth-card{padding:20px!important}.main-content,.admin-container{padding:12px!important}table{display:block;overflow-x:auto}}
+
+</style>
+</head>
+<body>
+
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <h3 id="loadingText" style="font-size: 16px; font-weight: bold;">তথ্য খোজা হচ্ছে...</h3>
+    <p style="font-size: 13px; color: #cbd5e1; margin-top: 4px;">দয়া করে একটু অপেক্ষা করুন...</p>
+  </div>
+
+  <header class="top-menubar" id="topHeader" style="display: none;">
+    <div class="menu-left">
+      <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+      <span id="topHeaderTitle">হোম</span>
+    </div>
+    <div class="menu-right">
+      <span class="balance-badge" id="userBalanceDisplay">ব্যালেন্স: 0 টাকা</span>
+    </div>
+  </header>
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <aside class="sidebar-drawer" id="sidebarDrawer">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">Manobotar Feriwala</div>
+      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+    </div>
+    <div class="service-item" onclick="selectService('হোম')"><span class="badge-num"></span><span>হোম পেজ</span></div>
+    <div class="service-item" onclick="selectService('অটো পেমেন্ট')"><span class="badge-num"></span><span>অটো পেমেন্ট (Auto Payment)</span></div>
+
+    <div class="sidebar-title">সার্ভিস তালিকা</div>
+    <div class="service-list">
+      <div class="service-item" onclick="selectService('সাইন কপি টু এনআইডি')"><span class="badge-num">01</span><span>সাইন কপি টু এনআইডি</span></div>
+      <div class="service-item" onclick="selectService('জন্ম নিবন্ধন মেক')"><span class="badge-num">02</span><span>জন্ম নিবন্ধন মেক</span></div>
+      <div class="service-item" onclick="selectService('সার্ভার কপি')"><span class="badge-num">03</span><span>সার্ভার কপি</span></div>
+      <div class="service-item" onclick="selectService('এনআইডি ম্যানুয়াল')"><span class="badge-num">04</span><span>এনআইডি ম্যানুয়াল</span></div>
+      <div class="service-item" onclick="alert('এই অপশনটিতে এখনো কাজ করা হয়নি!')"><span class="badge-num">05</span><span>সাইন কপি টু সার্ভার কপি</span></div>
+      <div class="service-item" onclick="selectService('জন্ম নিবন্ধন হিস্টোরি')"><span class="badge-num">06</span><span>জন্ম নিবন্ধন হিস্টোরি</span></div>
+      <div class="service-item" onclick="selectService('এনআইডি হিস্টোরি')"><span class="badge-num">07</span><span>এনআইডি হিস্টোরি</span></div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sidebar-user-info" id="sidebarUserEmail">ইউজার user@gmail.com</div>
+      <button class="logout-btn" onclick="handleLogout()">🚪 লগআউট</button>
+    </div>
+  </aside>
+
+  <div class="auth-container" id="loginBox">
+    <div class="auth-card">
+      <h2>ইউজার লগইন</h2>
+      <p class="sub-title">ইমেইল / ইউজার আইডি ও পাসওয়ার্ড দিয়ে লগইন করুন</p>
+      <form onsubmit="handleLogin(event)">
+        <input type="text" id="loginEmail" placeholder="ইমেইল এড্রেস অথবা ইউজার আইডি" required value="user@gmail.com">
+        <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" required value="123456">
+        <button type="submit">লগইন</button>
+      </form>
+      <div class="auth-toggle">একাউন্ট নেই? <span onclick="showRegister()">রেজিস্ট্রেশন করুন</span></div>
+    </div>
+  </div>
+
+  <div class="auth-container" id="registerBox" style="display: none;">
+    <div class="auth-card">
+      <h2>ইউজার রেজিস্ট্রেশন</h2>
+      <p class="sub-title">নতুন ইউজার একাউন্ট তৈরি করুন</p>
+      <form onsubmit="handleRegister(event)">
+        <input type="text" id="regUser" placeholder="পূর্ণ নাম" required>
+        <input type="email" id="regEmail" placeholder="ইমেইল এড্রেস" required>
+        <input type="password" id="regPass" placeholder="পাসওয়ার্ড" required>
+        <button type="submit" style="background: #10b981;">রেজিস্ট্রেশন করুন</button>
+      </form>
+      <div class="auth-toggle">আগের একাউন্ট আছে? <span onclick="showLogin()">লগইন করুন</span></div>
+    </div>
+  </div>
+
+  <div class="main-container" id="mainContent">
+    <div class="welcome-banner">
+      <h1>Manobotar Feriwala</h1>
+      <p>মেনু বার থেকে সার্ভিসগুলো দেখে নিন</p>
+    </div>
+
+    <!-- Auto Payment Option Form Box -->
+    <div class="card-box form-panel-wrapper" id="autoPaymentFormBox">
+      <div class="card-title">অটো পেমেন্ট মেথড (Add Balance)</div>
+      
+      <div class="payment-info-box">
+        <p style="font-weight: bold; color: #1e40af; margin-bottom: 6px;">পেমেন্ট ইন্সট্রাকশন:</p>
+        <p style="margin-bottom: 6px;">নিচের যেকোনো নাম্বারে 'Only bKash Payment' করুন:</p>
+        <div style="display: flex; flex-direction: column; gap: 6px; font-weight: bold; color: #0f172a; background: #ffffff; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 15px;">
+          <div>📱 বিকাশ (bKash Payment): <span id="adminBkashNo" style="color:#2563eb;">01712345678</span></div>
+        </div>
+        <p style="font-size: 12px; color: #d97706; margin-top: 8px; font-weight: bold;">⚠️ টাকা পাঠানোর পর Transaction ID, Sender Number এবং Screenshot দিয়ে সাবমিট করুন। ৫ মিনিটের মধ্যে অটোমেটিক ব্যালেন্স যোগ হয়ে যাবে!</p>
+      </div>
+
+      <form id="autoPaymentForm" onsubmit="handlePaymentSubmit(event)">
+        <div class="form-group">
+          <label>পেমেন্ট মেথড সিলেক্ট করুন <span>*</span></label>
+          <select id="payMethod" required>
+            <option value="bKash">bKash (বিকাশ)</option>
+          </select>
+        </div>
+        <div class="form-group"><label>যে নাম্বার থেকে টাকা পাঠিয়েছেন (Sender Mobile) <span>*</span></label><input type="text" id="paySenderNo" required placeholder="01XXXXXXXXX"></div>
+        <div class="form-group"><label>টাকার পরিমাণ (Amount) <span>*</span></label><input type="number" id="payAmount" required placeholder="উদাহরণ: 500"></div>
+        <div class="form-group"><label>ট্রানজেকশন আইডি (Transaction ID) <span>*</span></label><input type="text" id="payTrxId" required placeholder="TrxID (যেমন: TRX1234567)"></div>
+        <div class="form-group"><label>পেমেন্ট স্ক্রিনশট (Screenshot) <span>*</span></label><input type="file" id="payScreenshotFile" accept="image/*" required style="width: 100%;"></div>
+
+        <button type="submit" class="btn-submit" style="background: #10b981; margin-top: 6px;">পেমেন্ট সাবমিট করুন</button>
+      </form>
+    </div>
+
+    <!-- Auto Payment History Table Box -->
+    <div class="table-container" id="paymentHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">পেমেন্ট হিস্টোরি (Payment History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>মেথড / নাম্বার</th>
+            <th>পরিমাণ</th>
+            <th>TrxID</th>
+            <th>স্ট্যাটাস / সময়</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="paymentHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Birth Registration Form Box -->
+    <div class="card-box form-panel-wrapper" id="birthRegistrationFormBox">
+      <div class="card-title">জন্ম নিবন্ধন অনলাইন ফরম</div>
+      <form id="birthRegForm" onsubmit="handleBirthRegistrationSubmit(event)">
+        <div class="form-group">
+          <label>জন্ম নিবন্ধন নম্বর (১৭ ডিজিট)</label>
+          <input type="text" id="brNo" placeholder="যেমন: 19874793331391514">
+        </div>
+        <div class="form-group">
+          <label>জন্ম তারিখ (যেকোনো ফরম্যাট: YYYY-MM-DD)</label>
+          <input type="text" id="brSearchDob" placeholder="2000-09-13">
+        </div>
+
+        <div class="form-group" style="background: #f1f5f9; padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; margin-bottom: 12px;">
+          <label>নিচের ক্যাপচা কোডটি লিখুন</label>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+            <div id="captchaBoxDisplay" style="background: #e2e8f0; padding: 8px 14px; font-weight: bold; font-family: monospace; font-size: 18px; letter-spacing: 4px; color: #1e293b; border-radius: 6px; user-select: none;">8492</div>
+            <button type="button" onclick="loadNewCaptcha()" style="background: none; border: none; color: #2563eb; cursor: pointer; font-size: 13px; text-decoration: underline;">🔄 পরিবর্তন করুন</button>
+          </div>
+          <input type="text" id="brCaptchaInput" placeholder="ক্যাপচা কোড লিখুন" style="margin-bottom: 0;">
+        </div>
+        
+        <button type="button" class="btn-submit" onclick="fetchBirthRegistrationData()" style="background: #3b82f6; margin-bottom: 14px;">অনুসন্ধান করুন</button>
+
+        <div class="form-group"><label>Register Office Address</label><input type="text" id="brOfficeAddress" placeholder="রেজিস্টার অফিসের ঠিকানা"></div>
+        <div class="form-group"><label>Upazila/Pourashava/City Corporation, Zila</label><input type="text" id="brUpazilaZila" placeholder="উপজেলা/পৌরসভা/সিটি কর্পোরেশন, জেলা"></div>
+        <div class="form-group"><label>Birth Registration Number</label><input type="text" id="brRegNo" placeholder="XXXXXXXXXXXXX"></div>
+        <div class="form-group"><label>Gender</label><select id="brGender"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+        <div class="form-group"><label>Date of Registration</label><input type="text" id="brDateReg" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Date of Issuance</label><input type="text" id="brDateIssue" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Left Bar Code</label><input type="text" id="brLeftBarCode" placeholder="QZIP (আপনি চাইলে নিজেও লিখতে পারেন)"></div>
+        <div class="form-group"><label>QR Link</label><input type="text" id="brQrLink" placeholder="certificate/verify?key=..."></div>
+        <div class="form-group"><label>Date of Birth</label><input type="text" id="brDob" placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>Date of Birth in Word</label><input type="text" id="brDobInWord" placeholder="Eleventh August two thousand three"></div>
+        <div class="form-group"><label>নাম</label><input type="text" id="brNameBn" placeholder="সম্পূর্ণ নাম বাংলায়"></div>
+        <div class="form-group"><label>Name</label><input type="text" id="brNameEn" placeholder="Full Name in English"></div>
+        <div class="form-group"><label>পিতার নাম</label><input type="text" id="brFatherBn" placeholder="পিতার নাম বাংলায়"></div>
+        <div class="form-group"><label>Father Name</label><input type="text" id="brFatherEn" placeholder="Father Name in English"></div>
+        <div class="form-group"><label>পিতার জাতীয়তা</label><input type="text" id="brFatherNatBn" value="বাংলাদেশী"></div>
+        <div class="form-group"><label>Father Nationality</label><input type="text" id="brFatherNatEn" value="Bangladeshi"></div>
+        <div class="form-group"><label>মাতার নাম</label><input type="text" id="brMotherBn" placeholder="মাতার নাম বাংলায়"></div>
+        <div class="form-group"><label>Mother Name</label><input type="text" id="brMotherEn" placeholder="Mother Name in English"></div>
+        <div class="form-group"><label>মাতার জাতীয়তা</label><input type="text" id="brMotherNatBn" value="বাংলাদেশী"></div>
+        <div class="form-group"><label>Mother Nationality</label><input type="text" id="brMotherNatEn" value="Bangladeshi"></div>
+        <div class="form-group"><label>জন্মস্থান</label><input type="text" id="brBirthPlaceBn" placeholder="জন্মস্থান বাংলায়"></div>
+        <div class="form-group"><label>Place of Birth</label><input type="text" id="brBirthPlaceEn" placeholder="Place of Birth in English"></div>
+        <div class="form-group"><label>স্থায়ী ঠিকানা</label><textarea id="brAddressBn" rows="2" placeholder="স্থায়ী ঠিকানা বাংলায়"></textarea></div>
+        <div class="form-group"><label>Permanent Address</label><textarea id="brAddressEn" rows="2" placeholder="Permanent Address in English"></textarea></div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-top: 12px; margin-bottom: 10px;">
+          আপনার একাউন্ট থেকে ৩ টাকা কাটা হবে।
+        </div>
+        <div style="background: #fee2e2; border: 1px solid #fca5a5; color: #991b1b; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
+          জন্মনিবন্ধন সার্টিফিকেট তৈরি করার সময় যদি কিছু না আসে তাহলে সেগুলো নিজে পূরণ করে নিবেন।
+        </div>
+
+        <button type="submit" class="btn-submit" style="background: #3b82f6;">ডাউনলোড করুন</button>
+      </form>
+    </div>
+
+    <!-- Birth Registration History Table Box -->
+    <div class="table-container" id="birthHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">জন্ম নিবন্ধন হিস্টোরি (Birth Registration History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>নাম (Name)</th>
+            <th>জন্ম নিবন্ধন নম্বর (Reg No)</th>
+            <th>জন্ম তারিখ (DOB)</th>
+            <th>অ্যাকশন (Print & Edit)</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="birthHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Sign Copy to NID Form Box -->
+    <div class="card-box form-panel-wrapper" id="signCopyFormBox">
+      <form id="scMainForm" onsubmit="handleSignCopySubmit(event)">
+        <div style="border: 2px dashed #cbd5e1; background: #f8fafc; padding: 14px; border-radius: 10px; text-align: center; margin-bottom: 12px;">
+          <div style="font-size: 24px; margin-bottom: 4px;">📄</div>
+          <p style="font-size: 14px; color: #1e293b; font-weight: bold; margin-bottom: 6px;">১. এন.আই.ডি সাইন কপি (PDF / Image) আপলোড করুন</p>
+          
+          <div style="background: #dbeafe; color: #1e40af; padding: 8px; border-radius: 8px; font-size: 13px; font-weight: bold; margin-bottom: 8px;">
+            ⚡ Python Flask Backend & PyMuPDF Auto-Type Reader
+          </div>
+          <p style="font-size: 12px; color: #475569; margin-bottom: 8px;">যেকোনো PDF নির্বাচন করুন, Python সার্ভার স্বয়ংক্রিয়ভাবে সকল তথ্য ফর্মে সঠিক বাংলা ফন্টে পূরণ করে দিবে:</p>
+          <input type="file" id="pdfFile" accept=".pdf,image/*" onchange="handlePdfAutoFill(event)" style="width: 100%; max-width: 100%;">
+
+          <div class="separate-extract-container">
+            <div class="separate-extract-header">
+              <span>🖼️ PDF Image & Signature Converter (আলাদা ছবি ও স্বাক্ষর)</span>
+            </div>
+            <div style="margin-bottom: 8px;">
+              <input type="file" id="extractPdfFile" accept=".pdf" onchange="extractPhotoAndSignOnly(event)" style="width: 100%; max-width: 100%;">
+            </div>
+
+            <div class="extract-row" id="extractResultArea" style="display: none;">
+              <p style="font-size: 12px; color: #2563eb; font-weight: bold;">আপনার PDF থেকে ছবি ও স্বাক্ষর আলাদা করে দেওয়া হয়েছে। নিচে দুটোই ডাউনলোড করতে পারবেন।</p>
+              
+              <div class="extract-card">
+                <img id="extPhotoPreview" class="extract-img-thumb" alt="Photo">
+                <div class="extract-info">
+                  <h4>১. ব্যক্তির ছবি (Photo)</h4>
+                  <p>মূল PDF থেকে আলাদা করা হয়েছে।</p>
+                </div>
+                <a id="btnDownloadPhoto" class="extract-btn" download="photo.png">ছবি ডাউনলোড</a>
+              </div>
+
+              <div class="extract-card">
+                <img id="extSignPreview" class="extract-img-thumb" alt="Signature">
+                <div class="extract-info">
+                  <h4>২. স্বাক্ষর (Signature)</h4>
+                  <p>মূল PDF থেকে আলাদা করা হয়েছে।</p>
+                </div>
+                <a id="btnDownloadSign" class="extract-btn" download="signature.png">স্বাক্ষর ডাউনলোড</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+          <div style="flex: 1; min-width: 130px; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; background: #f8fafc;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 6px;">📸 ব্যক্তির ছবি</label>
+            <div style="width: 70px; height: 85px; background: #e2e8f0; margin: 0 auto 8px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <img id="scPhotoPreview" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <label style="background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              ⬆ নতুন ছবি আপলোড
+              <input type="file" id="scPhotoFile" accept="image/*" onchange="previewScPhoto(event)" style="display:none;">
+            </label>
+          </div>
+
+          <div style="flex: 1; min-width: 130px; border: 1px solid #cbd5e1; padding: 10px; border-radius: 8px; text-align: center; background: #f8fafc;">
+            <label style="font-weight: bold; font-size: 13px; display: block; margin-bottom: 6px;">✍️ স্বাক্ষর / সিগনেচার</label>
+            <div style="width: 110px; height: 55px; background: #e2e8f0; margin: 0 auto 8px; border-radius: 6px; display: flex; align-items: center; justify-content: center; overflow: hidden; font-size: 11px; color: #64748b;">
+              <span id="signPlaceholderText">সিগনেচার নেই</span>
+              <img id="scSignPreview" alt="" onload="autoFitSignOrThumb(this)" style="max-width: 100%; max-height: 100%; object-fit: contain; display:none;">
+            </div>
+            <label style="background: #3b82f6; color: white; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-block;">
+              ⬆ নতুন সিগনেচার আপলোড
+              <input type="file" id="scSignFile" accept="image/*" onchange="previewScSign(event)" style="display:none;">
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group"><label>নামঃ (বাংলা) <span>*</span></label><input type="text" id="scNameBn" required placeholder="বাংলা নাম লিখুন"></div>
+        <div class="form-group"><label>নামঃ (ইংরেজি) <span>*</span></label><input type="text" id="scNameEn" required placeholder="English Name"></div>
+        <div class="form-group"><label>আইডি নাম্বারঃ <span>*</span></label><input type="text" id="scIdNo" required placeholder="ID Number"></div>
+        <div class="form-group"><label>পিন নাম্বারঃ <span>*</span></label><input type="text" id="scPinNo" required placeholder="Pin Number"></div>
+        <div class="form-group"><label>পিতার নামঃ <span>*</span></label><input type="text" id="scFatherName" required placeholder="পিতার নাম লিখুন"></div>
+        <div class="form-group"><label>স্বামী অথবা স্ত্রীর নামঃ (ঐচ্ছিক)</label><input type="text" id="scSpouseName" placeholder="স্বামী বা স্ত্রীর নাম (যদি থাকে)"></div>
+        <div class="form-group"><label>মাতার নামঃ <span>*</span></label><input type="text" id="scMotherName" required placeholder="মাতার নাম লিখুন"></div>
+        <div class="form-group"><label>জন্মস্থানঃ <span>*</span></label><input type="text" id="scBirthPlace" required placeholder="জন্ম স্থান লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখঃ <span>*</span></label><input type="text" id="scDob" required placeholder="01 Jan 2001"></div>
+        <div class="form-group"><label>প্রদানের তারিখঃ <span>*</span></label><input type="text" id="scIssueDate" required placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>রক্তের গ্রুপঃ (ঐচ্ছিক)</label><input type="text" id="scBloodGroup" placeholder="A+"></div>
+        <div class="form-group"><label>ঠিকানাঃ <span>*</span> ( সিটি কর্পোরেশন বা পৌরসভা হলে পৌরসভা/সিটি কর্পোরেশনের নাম লিখুন )</label><textarea id="scAddress" rows="2" required placeholder="ঠিকানা লিখুন"></textarea></div>
+        
+        <div style="margin-bottom: 12px; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="sc17DigitCheck" style="width: 16px; height: 16px;">
+          <label for="sc17DigitCheck" style="margin-bottom: 0; font-weight: normal; cursor: pointer;">১৭ ডিজিট পুরাতন কার্ড হলে টিকমার্ক দিন। (টিক দিলে NID নাম্বার ১৭ ডিজিট হবে)</label>
+        </div>
+
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; padding: 10px; border-radius: 8px; text-align: center; font-size: 13px; font-weight: bold; margin-bottom: 12px;">
+          আপনার একাউন্ট থেকে ২ টাকা কাটা হবে।
+        </div>
+
+        <button type="submit" class="btn-submit">ডাউনলোড করুন</button>
+      </form>
+    </div>
+
+    <!-- Bangla NID Manual Form -->
+    <div class="card-box form-panel-wrapper" id="nidManualFormBox">
+      <div class="card-title">এনআইডি ম্যানুয়াল ফরম</div>
+      <form id="nidForm" onsubmit="handleManualDirectDownload(event)">
+        <div class="form-group"><label>এনআইডি নম্বর (NID) <span>*</span></label><input type="text" id="nidNo" required placeholder="এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>পুরাতন এনআইডি নম্বর (Old NID) <span>*</span></label><input type="text" id="oldNidNo" required placeholder="পুরাতন এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখ (Date of Birth) <span>*</span></label><input type="text" id="dob" required placeholder="জন্ম তারিখ (যেমন: 10 Feb 1956)"></div>
+        <div class="form-group"><label>নাম (বাংলা) <span>*</span></label><input type="text" id="nameBn" required placeholder="বাংলা নাম লিখুন"></div>
+        <div class="form-group"><label>নাম (ইংরেজি) <span>*</span></label><input type="text" id="nameEn" required placeholder="English Name"></div>
+        <div class="form-group"><label>পিতার নাম (বাংলা) <span>*</span></label><input type="text" id="fatherName" required placeholder="পিতার নাম লিখুন"></div>
+        <div class="form-group"><label>মাতার নাম (বাংলা) <span>*</span></label><input type="text" id="motherName" required placeholder="মাতার নাম লিখুন"></div>
+        <div class="form-group"><label>জন্মস্থান (বাংলা) <span>*</span></label><input type="text" id="birthPlace" required placeholder="জন্মস্থান লিখুন"></div>
+        <div class="form-group"><label>প্রদানের তারিখ (Issue Date) <span>*</span></label><input type="text" id="issueDate" required placeholder="DD/MM/YYYY"></div>
+        <div class="form-group"><label>রক্তের গ্রুপ (Blood Group)</label><input type="text" id="bloodGroup" placeholder="A+"></div>
+        <div class="form-group"><label>ঠিকানা (বাংলা) <span>*</span></label><textarea id="address" rows="2" required placeholder="ঠিকানা লিখুন"></textarea></div>
+        <div class="form-group"><label>ছবি আপলোড (Photo)</label><input type="file" id="photoFile" accept="image/*" onchange="previewPhoto(event)" style="width: 100%;"></div>
+        <div class="form-group"><label>স্বাক্ষর আপলোড (Signature)</label><input type="file" id="signFile" accept="image/*" onchange="previewSign(event)" style="width: 100%;"></div>
+        <button type="submit" class="btn-submit">ডাইরেক্ট ডাউনলোড & প্রিন্ট</button>
+      </form>
+    </div>
+
+    <!-- Manual NID Download History Table Box -->
+    <div class="table-container" id="manualHistoryContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">ম্যানুয়াল এনআইডি হিস্টোরি (Manual NID Download History)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>নাম (Name)</th>
+            <th>এনআইডি (NID)</th>
+            <th>জন্ম তারিখ (DOB)</th>
+            <th>অ্যাকশন (Print & Edit)</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="manualHistoryTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Server Copy Request Form -->
+    <div class="card-box form-panel-wrapper" id="serverCopyFormBox">
+      <div class="card-title">সার্ভার কপি আবেদন ফরম</div>
+      <form id="serverCopyForm" onsubmit="handleServerCopyRequest(event)">
+        <div class="form-group"><label>এনআইডি নম্বর <span>*</span></label><input type="text" id="scNidNo" required placeholder="এনআইডি নম্বর লিখুন"></div>
+        <div class="form-group"><label>জন্ম তারিখ <span>*</span></label><input type="text" id="reqDob" required placeholder="YYYY-MM-DD"></div>
+        <button type="submit" class="btn-submit" style="background: #2563eb;">ডাউনলোড</button>
+      </form>
+    </div>
+
+    <!-- User Request List Table for Server Copy -->
+    <div class="table-container" id="userTableContainer">
+      <div style="font-weight: bold; margin-bottom: 8px; font-size: 15px; color: #1e293b;">আবেদন সমূহের তালিকা (Request List)</div>
+      <table>
+        <thead>
+          <tr>
+            <th>এনআইডি</th>
+            <th>জন্ম তারিখ</th>
+            <th>স্ট্যাটাস / সময় / নোট</th>
+            <th>অ্যাকশন</th>
+            <th>ডিলিট</th>
+          </tr>
+        </thead>
+        <tbody id="userRequestTable"></tbody>
+      </table>
+    </div>
+
+    <!-- Printable Layout (NID) -->
+    <div id="printable-nid-wrapper">
+      <div class="nid-portrait-page">
+        <img class="field-photo" id="out-photo" alt="" style="position: absolute; left: 77px; top: 185px; width: 62px; height: 73px; object-fit: cover; z-index: 2;" src=""> 
+        <img class="field-photo" id="out-sign" alt="" onload="autoFitSignOrThumb(this)" style="position: absolute; left: 77px; top: 250px; width: 62px; height: 50px; object-fit: contain; z-index: 2;" src=""> 
+        <div class="text-block" id="out-nameBn" style="left: 202px; top: 188px; font-size: 13px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-nameEn" style="left: 202px; top: 213.4px; font-size: 12px; font-weight: bold;"></div>
+        <div class="text-block" id="out-fatherName" style="left: 202px; top: 234px; font-size: 12px;"></div>
+        <div class="text-block" id="out-motherName" style="left: 202px; top: 255px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-dob" style="left: 220px; top: 274px; font-size: 12px; color: #ec0b43;"></div>
+        <div class="text-block english-field" id="out-nidNo" style="left: 202px; top: 291.5px; font-size: 12.5px; font-weight: bold; color: #ec0b43;"></div>
+
+        <div class="text-block" id="out-address" style="left: 435px; top: 155px; font-size: 10px; width: 250px; white-space: normal; line-height: 1.25;"></div>
+        <div class="text-block english-field" id="out-bloodGroup" style="left: 498px; top: 208px; font-size: 10px; font-weight: bold; color: #be123c;"></div>
+        <div class="text-block" id="out-birthPlace" style="left: 555px; top: 207.5px; font-size: 09px;"></div>
+        <div class="text-block english-field" id="out-issueDate" style="left: 635px; top: 250.4px; font-size: 10px; font-family: 'SolaimanLipi', 'Noto Serif Bengali', Arial, sans-serif;"></div>
+        <canvas id="pdf417-barcode" style="position: absolute; left: 400px; top: 270px; width: 300px; height: 39px; z-index: 2;"></canvas>
+      </div>
+    </div>
+
+    <!-- Printable Layout (Birth Registration Full Output) -->
+    <div id="printable-birth-wrapper">
+      <div class="birth-portrait-page">
+        <div class="text-block" id="out-brOfficeAddress" style="left: 150px; top: 110px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brUpazilaZila" style="left: 150px; top: 135px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brRegNo" style="left: 280px; top: 190px; font-size: 13px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-brGender" style="left: 560px; top: 190px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brDateReg" style="left: 180px; top: 215px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brDateIssue" style="left: 560px; top: 215px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brLeftBarCode" style="left: 100px; top: 80px; font-size: 10px;"></div>
+        
+        <div class="text-block english-field" id="out-brDob" style="left: 280px; top: 265px; font-size: 12px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-brDobInWord" style="left: 280px; top: 285px; font-size: 11px;"></div>
+        
+        <div class="text-block" id="out-brNameBn" style="left: 300px; top: 325px; font-size: 13px; font-weight: bold;"></div>
+        <div class="text-block english-field" id="out-brNameEn" style="left: 300px; top: 345px; font-size: 12px;"></div>
+        
+        <div class="text-block" id="out-brFatherBn" style="left: 300px; top: 385px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-brFatherEn" style="left: 300px; top: 405px; font-size: 11px;"></div>
+        <div class="text-block" id="out-brFatherNatBn" style="left: 600px; top: 385px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brFatherNatEn" style="left: 600px; top: 405px; font-size: 11px;"></div>
+        
+        <div class="text-block" id="out-brMotherBn" style="left: 300px; top: 445px; font-size: 12px;"></div>
+        <div class="text-block english-field" id="out-brMotherEn" style="left: 300px; top: 465px; font-size: 11px;"></div>
+        <div class="text-block" id="out-brMotherNatBn" style="left: 600px; top: 445px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brMotherNatEn" style="left: 600px; top: 465px; font-size: 11px;"></div>
+
+        <div class="text-block" id="out-brBirthPlaceBn" style="left: 300px; top: 505px; font-size: 11px;"></div>
+        <div class="text-block english-field" id="out-brBirthPlaceEn" style="left: 300px; top: 525px; font-size: 11px;"></div>
+        
+        <div class="text-block" id="out-brAddressBn" style="left: 300px; top: 565px; font-size: 11px; width: 420px; white-space: normal;"></div>
+        <div class="text-block english-field" id="out-brAddressEn" style="left: 300px; top: 595px; font-size: 11px; width: 420px; white-space: normal;"></div>
+      </div>
+    </div>
+
+  </div> <!-- Main Container Closing -->
+
+  <script>
+    let loggedInUserEmail = '';
+    let loggedInUserId = '';
+    let tempUploadedPhoto = '';
+    let tempUploadedSign = '';
+    let editingManualRecordId = null;
+    let editingBirthRecordId = null;
+    let currentCaptchaCode = '';
+
+    if (window.pdfjsLib) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+    }
+
+    function autoFitSignOrThumb(imgElement) {
+      if (!imgElement || !imgElement.src || imgElement.src === window.location.href) return;
+      const naturalWidth = imgElement.naturalWidth;
+      const naturalHeight = imgElement.naturalHeight;
+
+      if (naturalHeight > naturalWidth) {
+        imgElement.style.transform = 'rotate(90deg)';
+        imgElement.style.maxWidth = '42px';
+        imgElement.style.maxHeight = '42px';
+      } else {
+        imgElement.style.transform = 'none';
+        imgElement.style.maxWidth = '100%';
+        imgElement.style.maxHeight = '100%';
+      }
+    }
+
+    function loadNewCaptcha() {
+      const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let code = '';
+      for (let i = 0; i < 4; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      currentCaptchaCode = code;
+      const displayEl = document.getElementById('captchaBoxDisplay');
+      if (displayEl) displayEl.innerText = code;
+    }
+
+    function convertToBanglaDigits(str) {
+      const banglaDigits = {'0':'০', '1':'১', '2':'২', '3':'৩', '4':'৪', '5':'৫', '6':'৬', '7':'৭', '8':'৮', '9':'৯'};
+      return String(str).replace(/[0-9]/g, function(w) { return banglaDigits[w]; });
+    }
+
+    function formatDateToDDMonYYYY(dateStr) {
+      if (!dateStr) return '';
+      let day = '', month = '', year = '';
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+      if (dateStr.includes('-')) {
+        let parts = dateStr.split('-');
+        if (parts[0].length === 4) {
+          year = parts[0];
+          month = parseInt(parts[1], 10);
+          day = parts[2];
+        } else {
+          day = parts[0];
+          month = parseInt(parts[1], 10);
+          year = parts[2];
+        }
+      } else if (dateStr.includes('/')) {
+        let parts = dateStr.split('/');
+        day = parts[0];
+        month = parseInt(parts[1], 10);
+        year = parts[2];
+      }
+
+      if (day && month && year && month >= 1 && month <= 12) {
+        day = String(day).padStart(2, '0');
+        return `${day} ${months[month - 1]} ${year}`;
+      }
+      return dateStr;
+    }
+
+    function fixFontBreakage(text) {
+      if (!text) return '';
+      let str = text.replace(/VOTER FORM|Smart Card Info|VOTERFORMSmart Card|Permanent Address|Present Address|Union|Ward|City Corporation|Municipality|Division|District|Upozila|Mouza|Moholla|Ward For|Porishod|Home|Holding|Village|Road|Post Office|Postal Code|Regional Code|Additional|[A-Za-z]/gi, '');
+
+      str = str.replace(/মোঃঃ/g, 'মোঃ');
+      str = str.replace(/মোাঃঃ/g, 'মোঃ');
+      str = str.replace(/মোাঃ/g, 'মোঃ');
+      str = str.replace(/ঃঃ/g, 'ঃ');
+      str = str.replace(/::/g, ':');
+      str = str.replace(/া+/g, 'া');
+
+      str = str.replace(/\s+/g, ' ').trim();
+
+      const replacements = {
+        'মাঃ আ ল ফ': 'মোঃ আলিফ', 'মাঃআলফ': 'মোঃ আলিফ',
+        'তিহ্দাআগার': 'তৌহিদা আক্তার', 'তৌহিদা আক্তার': 'তৌহিদা আক্তার',
+        'কুমিা': 'কুমিল্লা', 'কুমিল্লাা': 'কুমিল্লা'
+      };
+
+      for (let key in replacements) {
+        if (str.includes(key)) str = str.split(key).join(replacements[key]);
+      }
+
+      return str.trim();
+    }
+
+    function getUserBalance(email) {
+      let balances = JSON.parse(localStorage.getItem('portal_user_balances') || '{}');
+      if (balances[email] === undefined) {
+        balances[email] = 0;
+        localStorage.setItem('portal_user_balances', JSON.stringify(balances));
+      }
+      return balances[email];
+    }
+
+    function updateUserBalance(email, amountToAdd) {
+      let balances = JSON.parse(localStorage.getItem('portal_user_balances') || '{}');
+      let currentBal = balances[email] || 0;
+      balances[email] = currentBal + parseFloat(amountToAdd);
+      localStorage.setItem('portal_user_balances', JSON.stringify(balances));
+      updateBalanceUI();
+    }
+
+    function updateBalanceUI() {
+      if(loggedInUserEmail) {
+        const bal = getUserBalance(loggedInUserEmail);
+        document.getElementById('userBalanceDisplay').innerText = `ব্যালেন্স: ${convertToBanglaDigits(bal)} টাকা`;
+      }
+    }
+
+    function loadAdminSettings() {
+      let settings = JSON.parse(localStorage.getItem('portal_admin_settings') || '{}');
+      const bkashNum = settings.bkash || '01712345678';
+      const bkashEl = document.getElementById('adminBkashNo');
+      if(bkashEl) bkashEl.innerText = bkashNum;
+    }
+
+    function autoSetTodayIssueDate() {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      const banglaDateStr = convertToBanglaDigits(`${dd}/${mm}/${yyyy}`);
+      
+      const issueInput = document.getElementById('issueDate');
+      if (issueInput) issueInput.value = banglaDateStr;
+      const scIssueInput = document.getElementById('scIssueDate');
+      if (scIssueInput) scIssueInput.value = banglaDateStr;
+    }
+
+    function resetAllFormData() {
+      editingManualRecordId = null;
+      editingBirthRecordId = null;
+      const forms = ['scMainForm', 'nidForm', 'serverCopyForm', 'autoPaymentForm', 'birthRegForm'];
+      forms.forEach(id => {
+        const f = document.getElementById(id);
+        if (f) f.reset();
+      });
+
+      const fileInputs = ['pdfFile', 'extractPdfFile', 'scPhotoFile', 'scSignFile', 'photoFile', 'signFile', 'payScreenshotFile'];
+      fileInputs.forEach(id => {
+        const inp = document.getElementById(id);
+        if (inp) inp.value = '';
+      });
+
+      tempUploadedPhoto = '';
+      tempUploadedSign = '';
+
+      document.getElementById('scPhotoPreview').src = '';
+      const scSignPrev = document.getElementById('scSignPreview');
+      scSignPrev.src = '';
+      scSignPrev.style.display = 'none';
+      scSignPrev.style.transform = 'none';
+      document.getElementById('signPlaceholderText').style.display = 'inline';
+
+      document.getElementById('out-photo').src = '';
+      const outSign = document.getElementById('out-sign');
+      outSign.src = '';
+      outSign.style.transform = 'none';
+
+      document.getElementById('extPhotoPreview').src = '';
+      document.getElementById('extSignPreview').src = '';
+      document.getElementById('btnDownloadPhoto').href = '#';
+      document.getElementById('btnDownloadSign').href = '#';
+      document.getElementById('extractResultArea').style.display = 'none';
+
+      loadNewCaptcha();
+      autoSetTodayIssueDate();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadAdminSettings();
+      loadNewCaptcha();
+      const savedUser = JSON.parse(localStorage.getItem('portal_active_session'));
+      if (savedUser && savedUser.email) {
+        loggedInUserEmail = savedUser.email;
+        loggedInUserId = savedUser.userId || 'SB-1001';
+        renderDashboard();
+      }
+    });
+
+    function renderDashboard() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('registerBox').style.display = 'none';
+      document.getElementById('topHeader').style.display = 'flex';
+      document.getElementById('mainContent').style.display = 'block';
+      
+      const userEl = document.getElementById('sidebarUserEmail');
+      if(userEl) userEl.innerText = 'ইউজার: ' + loggedInUserEmail;
+      
+      updateBalanceUI();
+
+      const savedService = localStorage.getItem('portal_active_service') || 'হোম';
+      selectService(savedService, false);
+      autoSetTodayIssueDate();
+    }
+
+    function toggleSidebar() {
+      document.getElementById('sidebarDrawer').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    function selectService(serviceName, resetForm = true) {
+      localStorage.setItem('portal_active_service', serviceName);
+
+      document.getElementById('topHeaderTitle').innerText = serviceName;
+      document.getElementById('signCopyFormBox').classList.remove('active');
+      document.getElementById('nidManualFormBox').classList.remove('active');
+      document.getElementById('manualHistoryContainer').classList.remove('active');
+      document.getElementById('serverCopyFormBox').classList.remove('active');
+      document.getElementById('userTableContainer').classList.remove('active');
+      document.getElementById('autoPaymentFormBox').classList.remove('active');
+      document.getElementById('paymentHistoryContainer').classList.remove('active');
+      document.getElementById('birthRegistrationFormBox').classList.remove('active');
+      document.getElementById('birthHistoryContainer').classList.remove('active');
+
+      if (resetForm) {
+        resetAllFormData();
+      }
+
+      if (serviceName === 'হোম') {
+        // Banner active
+      } else if (serviceName === 'সাইন কপি টু এনআইডি') {
+        document.getElementById('signCopyFormBox').classList.add('active');
+      } else if (serviceName === 'জন্ম নিবন্ধন মেক') {
+        document.getElementById('birthRegistrationFormBox').classList.add('active');
+      } else if (serviceName === 'জন্ম নিবন্ধন হিস্টোরি') {
+        document.getElementById('birthHistoryContainer').classList.add('active');
+        loadBirthHistory();
+      } else if (serviceName === 'সার্ভার কপি') {
+        document.getElementById('serverCopyFormBox').classList.add('active');
+        document.getElementById('userTableContainer').classList.add('active');
+        loadUserRequests();
+      } else if (serviceName === 'এনআইডি ম্যানুয়াল') {
+        document.getElementById('nidManualFormBox').classList.add('active');
+      } else if (serviceName === 'এনআইডি হিস্টোরি') {
+        document.getElementById('manualHistoryContainer').classList.add('active');
+        loadManualHistory();
+      } else if (serviceName === 'অটো পেমেন্ট') {
+        loadAdminSettings();
+        document.getElementById('autoPaymentFormBox').classList.add('active');
+        document.getElementById('paymentHistoryContainer').classList.add('active');
+        loadPaymentHistory();
+      }
+
+      autoSetTodayIssueDate();
+
+      const drawer = document.getElementById('sidebarDrawer');
+      if (drawer.classList.contains('active')) {
+        toggleSidebar();
+      }
+    }
+
+    async function fetchBirthRegistrationData() {
+      const brNo = document.getElementById('brNo').value.trim();
+      const dob = document.getElementById('brSearchDob').value.trim();
+      const userCaptcha = document.getElementById('brCaptchaInput').value.trim().toUpperCase();
+
+      if (!brNo || !dob) {
+        alert('দয়া করে ১৭ ডিজিটের জন্ম নিবন্ধন নম্বর এবং জন্ম তারিখ প্রদান করুন!');
+        return;
+      }
+
+      if (!userCaptcha) {
+        alert('দয়া করে ক্যাপচা কোডটি লিখুন!');
+        return;
+      }
+
+      if (userCaptcha !== currentCaptchaCode) {
+        alert('ভুল ক্যাপচা কোড! দয়া করে সঠিক ক্যাপচা দিন।');
+        loadNewCaptcha();
+        return;
+      }
+
+      const loadingEl = document.getElementById('loadingOverlay');
+      document.getElementById('loadingText').innerText = "everify.bdris.gov.bd থেকে ডাটা নেওয়া হচ্ছে...";
+      loadingEl.style.display = 'flex';
+
+      try {
+        const proxyUrl = `verify-birth.php?ubrn=${brNo}&dob=${dob}&captcha=${userCaptcha}`;
+        const response = await fetch(proxyUrl, { method: 'GET' });
+        
+        if (!response.ok) throw new Error('Server response error');
+        const data = await response.json();
+
+        if (data && data.nameBn) {
+          document.getElementById('brOfficeAddress').value = data.officeAddress || '';
+          document.getElementById('brUpazilaZila').value = data.upazilaZila || '';
+          document.getElementById('brRegNo').value = data.regNo || brNo;
+          document.getElementById('brGender').value = data.gender || 'Male';
+          document.getElementById('brDateReg').value = data.dateReg || '';
+          document.getElementById('brDateIssue').value = data.dateIssue || '';
+          document.getElementById('brLeftBarCode').value = data.leftBarCode || 'QZIP';
+          document.getElementById('brQrLink').value = data.qrLink || '';
+          document.getElementById('brDob').value = data.dob || dob;
+          document.getElementById('brDobInWord').value = data.dobInWord || '';
+          document.getElementById('brNameBn').value = data.nameBn || '';
+          document.getElementById('brNameEn').value = data.nameEn || '';
+          document.getElementById('brFatherBn').value = data.fatherBn || '';
+          document.getElementById('brFatherEn').value = data.fatherEn || '';
+          document.getElementById('brFatherNatBn').value = data.fatherNatBn || 'বাংলাদেশী';
+          document.getElementById('brFatherNatEn').value = data.fatherNatEn || 'Bangladeshi';
+          document.getElementById('brMotherBn').value = data.motherBn || '';
+          document.getElementById('brMotherEn').value = data.motherEn || '';
+          document.getElementById('brMotherNatBn').value = data.motherNatBn || 'বাংলাদেশী';
+          document.getElementById('brMotherNatEn').value = data.motherNatEn || 'Bangladeshi';
+          document.getElementById('brBirthPlaceBn').value = data.birthPlaceBn || '';
+          document.getElementById('brBirthPlaceEn').value = data.birthPlaceEn || '';
+          document.getElementById('brAddressBn').value = data.addressBn || '';
+          document.getElementById('brAddressEn').value = data.addressEn || '';
+          
+          alert('তথ্য সফলভাবে অনুসন্ধান করে ফর্মে বসানো হয়েছে!');
+        } else {
+          alert('কোনো তথ্য পাওয়া যায়নি! ম্যানুয়ালি পূরণ করুন।');
+        }
+
+      } catch (err) {
+        console.error('Fetch Error:', err);
+        alert('everify.bdris.gov.bd এর সাথে যোগাযোগ করা সম্ভব হয়নি। অনুগ্রহ করে ম্যানুয়ালি ডাটা পূরণ করুন।');
+      } finally {
+        loadingEl.style.display = 'none';
+        loadNewCaptcha();
+        document.getElementById('brCaptchaInput').value = '';
+      }
+    }
+
+    function handleBirthRegistrationSubmit(e) {
+      e.preventDefault();
+      const userBal = getUserBalance(loggedInUserEmail);
+      if (userBal < 3) {
+        alert('আপনার ব্যালেন্স পর্যাপ্ত নেই! জন্ম নিবন্ধন তৈরি করার জন্য অন্তত ৩ টাকা লাগবে। দয়া করে অটো পেমেন্টের মাধ্যমে ব্যালেন্স অ্যাড করুন।');
+        return;
+      }
+
+      updateUserBalance(loggedInUserEmail, -3);
+
+      const birthRecord = {
+        id: editingBirthRecordId ? editingBirthRecordId : Date.now(),
+        userEmail: loggedInUserEmail,
+        brNo: document.getElementById('brRegNo').value || document.getElementById('brNo').value || '20175452452445',
+        dob: document.getElementById('brDob').value || document.getElementById('brSearchDob').value || '',
+        nameBn: document.getElementById('brNameBn').value || 'জন্ম নিবন্ধন',
+        nameEn: document.getElementById('brNameEn').value || '',
+        fatherBn: document.getElementById('brFatherBn').value || '',
+        fatherEn: document.getElementById('brFatherEn').value || '',
+        motherBn: document.getElementById('brMotherBn').value || '',
+        motherEn: document.getElementById('brMotherEn').value || '',
+        officeAddress: document.getElementById('brOfficeAddress').value || '',
+        upazilaZila: document.getElementById('brUpazilaZila').value || '',
+        gender: document.getElementById('brGender').value || 'Male',
+        dateReg: document.getElementById('brDateReg').value || '',
+        dateIssue: document.getElementById('brDateIssue').value || '',
+        leftBarCode: document.getElementById('brLeftBarCode').value || 'QZIP',
+        qrLink: document.getElementById('brQrLink').value || '',
+        dobInWord: document.getElementById('brDobInWord').value || '',
+        fatherNatBn: document.getElementById('brFatherNatBn').value || 'বাংলাদেশী',
+        fatherNatEn: document.getElementById('brFatherNatEn').value || 'Bangladeshi',
+        motherNatBn: document.getElementById('brMotherNatBn').value || 'বাংলাদেশী',
+        motherNatEn: document.getElementById('brMotherNatEn').value || 'Bangladeshi',
+        birthPlaceBn: document.getElementById('brBirthPlaceBn').value || '',
+        birthPlaceEn: document.getElementById('brBirthPlaceEn').value || '',
+        addressBn: document.getElementById('brAddressBn').value || '',
+        addressEn: document.getElementById('brAddressEn').value || ''
+      };
+
+      let birthList = JSON.parse(localStorage.getItem('portal_birth_history') || '[]');
+      if (editingBirthRecordId) {
+        const idx = birthList.findIndex(b => b.id === editingBirthRecordId);
+        if (idx !== -1) birthList[idx] = birthRecord;
+        else birthList.unshift(birthRecord);
+      } else {
+        birthList.unshift(birthRecord);
+      }
+      localStorage.setItem('portal_birth_history', JSON.stringify(birthList));
+      editingBirthRecordId = null;
+
+      selectService('জন্ম নিবন্ধন হিস্টোরি');
+      triggerBirthPrint(birthRecord);
+    }
+
+    function editBirthRecord(recordId) {
+      let birthList = JSON.parse(localStorage.getItem('portal_birth_history') || '[]');
+      const target = birthList.find(b => b.id === recordId);
+      if (target) {
+        editingBirthRecordId = recordId;
+        selectService('জন্ম নিবন্ধন মেক', false);
+        
+        document.getElementById('brOfficeAddress').value = target.officeAddress || '';
+        document.getElementById('brUpazilaZila').value = target.upazilaZila || '';
+        document.getElementById('brRegNo').value = target.brNo || '';
+        document.getElementById('brGender').value = target.gender || 'Male';
+        document.getElementById('brDateReg').value = target.dateReg || '';
+        document.getElementById('brDateIssue').value = target.dateIssue || '';
+        document.getElementById('brLeftBarCode').value = target.leftBarCode || 'QZIP';
+        document.getElementById('brQrLink').value = target.qrLink || '';
+        document.getElementById('brDob').value = target.dob || '';
+        document.getElementById('brDobInWord').value = target.dobInWord || '';
+        document.getElementById('brNameBn').value = target.nameBn || '';
+        document.getElementById('brNameEn').value = target.nameEn || '';
+        document.getElementById('brFatherBn').value = target.fatherBn || '';
+        document.getElementById('brFatherEn').value = target.fatherEn || '';
+        document.getElementById('brFatherNatBn').value = target.fatherNatBn || 'বাংলাদেশী';
+        document.getElementById('brFatherNatEn').value = target.fatherNatEn || 'Bangladeshi';
+        document.getElementById('brMotherBn').value = target.motherBn || '';
+        document.getElementById('brMotherEn').value = target.motherEn || '';
+        document.getElementById('brMotherNatBn').value = target.motherNatBn || 'বাংলাদেশী';
+        document.getElementById('brMotherNatEn').value = target.motherNatEn || 'Bangladeshi';
+        document.getElementById('brBirthPlaceBn').value = target.birthPlaceBn || '';
+        document.getElementById('brBirthPlaceEn').value = target.birthPlaceEn || '';
+        document.getElementById('brAddressBn').value = target.addressBn || '';
+        document.getElementById('brAddressEn').value = target.addressEn || '';
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function triggerBirthPrint(data) {
+      document.body.classList.add('printing-birth');
+
+      document.getElementById('out-brOfficeAddress').innerText = data.officeAddress || '';
+      document.getElementById('out-brUpazilaZila').innerText = data.upazilaZila || '';
+      document.getElementById('out-brRegNo').innerText = data.brNo || '';
+      document.getElementById('out-brGender').innerText = data.gender || '';
+      document.getElementById('out-brDateReg').innerText = data.dateReg || '';
+      document.getElementById('out-brDateIssue').innerText = data.dateIssue || '';
+      document.getElementById('out-brLeftBarCode').innerText = data.leftBarCode || '';
+
+      document.getElementById('out-brDob').innerText = data.dob || '';
+      document.getElementById('out-brDobInWord').innerText = data.dobInWord || '';
+
+      document.getElementById('out-brNameBn').innerText = data.nameBn || '';
+      document.getElementById('out-brNameEn').innerText = data.nameEn || '';
+
+      document.getElementById('out-brFatherBn').innerText = data.fatherBn || '';
+      document.getElementById('out-brFatherEn').innerText = data.fatherEn || '';
+      document.getElementById('out-brFatherNatBn').innerText = data.fatherNatBn || 'বাংলাদেশী';
+      document.getElementById('out-brFatherNatEn').innerText = data.fatherNatEn || 'Bangladeshi';
+
+      document.getElementById('out-brMotherBn').innerText = data.motherBn || '';
+      document.getElementById('out-brMotherEn').innerText = data.motherEn || '';
+      document.getElementById('out-brMotherNatBn').innerText = data.motherNatBn || 'বাংলাদেশী';
+      document.getElementById('out-brMotherNatEn').innerText = data.motherNatEn || 'Bangladeshi';
+
+      document.getElementById('out-brBirthPlaceBn').innerText = data.birthPlaceBn || '';
+      document.getElementById('out-brBirthPlaceEn').innerText = data.birthPlaceEn || '';
+
+      document.getElementById('out-brAddressBn').innerText = data.addressBn || '';
+      document.getElementById('out-brAddressEn').innerText = data.addressEn || '';
+
+      const bgImg = new Image();
+      bgImg.src = 'birth-bg.jpg';
+      
+      const doPrint = function() {
+        window.print();
+        setTimeout(() => { document.body.classList.remove('printing-birth'); }, 500);
+      };
+
+      bgImg.onload = function() { setTimeout(doPrint, 200); };
+      bgImg.onerror = function() { setTimeout(doPrint, 200); };
+    }
+
+    function reprintBirthRecord(recordId) {
+      let birthList = JSON.parse(localStorage.getItem('portal_birth_history') || '[]');
+      const target = birthList.find(b => b.id === recordId);
+      if (target) triggerBirthPrint(target);
+    }
+
+    function deleteBirthHistory(recordId) {
+      if (confirm('আপনি কি সত্যি এই জন্ম নিবন্ধন হিস্টোরিটি ডিলিট করতে চান?')) {
+        let birthList = JSON.parse(localStorage.getItem('portal_birth_history') || '[]');
+        birthList = birthList.filter(b => b.id !== recordId);
+        localStorage.setItem('portal_birth_history', JSON.stringify(birthList));
+        loadBirthHistory();
+      }
+    }
+
+    function loadBirthHistory() {
+      let birthList = JSON.parse(localStorage.getItem('portal_birth_history') || '[]');
+      const tbody = document.getElementById('birthHistoryTable');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const userBirthHistory = birthList.filter(b => b.userEmail === loggedInUserEmail);
+
+      if (userBirthHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#64748b;">কোনো জন্ম নিবন্ধন হিস্টোরি পাওয়া যায়নি।</td></tr>';
+        return;
+      }
+
+      userBirthHistory.forEach(b => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${b.nameBn}</strong></td>
+            <td>${b.brNo}</td>
+            <td>${b.dob}</td>
+            <td>
+              <button class="action-btn-download" onclick="reprintBirthRecord(${b.id})">প্রিন্ট / ডাউনলোড</button>
+              <button class="action-btn-edit" onclick="editBirthRecord(${b.id})" title="তথ্য এডিট করুন">✏️</button>
+            </td>
+            <td><button class="btn-user-delete" onclick="deleteBirthHistory(${b.id})">🗑️</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function compressScreenshotImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const MAX_SIZE = 800;
+          if (width > height) {
+            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+          } else {
+            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          callback(canvas.toDataURL('image/jpeg', 0.7));
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handlePaymentSubmit(e) {
+      e.preventDefault();
+      const method = document.getElementById('payMethod').value;
+      const senderNo = document.getElementById('paySenderNo').value.trim();
+      const amount = parseFloat(document.getElementById('payAmount').value);
+      const trxId = document.getElementById('payTrxId').value.trim();
+      const screenshotInput = document.getElementById('payScreenshotFile');
+
+      if (!senderNo || !amount || !trxId) {
+        alert('দয়া করে সবগুলো ঘর সঠিকভাবে পূরণ করুন!');
+        return;
+      }
+
+      if (!screenshotInput.files || !screenshotInput.files[0]) {
+        alert('দয়া করে পেমেন্টের স্ক্রিনশট ফাইলটি আপলোড করুন!');
+        return;
+      }
+
+      compressScreenshotImage(screenshotInput.files[0], function(screenshotBase64) {
+        let payments = JSON.parse(localStorage.getItem('portal_payments_db') || '[]');
+        const now = Date.now();
+        const autoApproveTime = now + (5 * 60 * 1000);
+
+        const newPayment = {
+          id: Date.now(),
+          userEmail: loggedInUserEmail,
+          userId: loggedInUserId,
+          method: method,
+          senderNo: senderNo,
+          amount: amount,
+          trxId: trxId,
+          screenshot: screenshotBase64,
+          status: 'Pending',
+          timestamp: now,
+          autoApproveTime: autoApproveTime,
+          balanceAdded: false
+        };
+
+        payments.unshift(newPayment);
+        try {
+          localStorage.setItem('portal_payments_db', JSON.stringify(payments));
+        } catch (err) {
+          payments = payments.slice(0, 15);
+          localStorage.setItem('portal_payments_db', JSON.stringify(payments));
+        }
+
+        alert('পেমেন্ট রিকোয়েস্ট সফলভাবে সাবমিট হয়েছে!');
+        document.getElementById('autoPaymentForm').reset();
+        loadPaymentHistory();
+      });
+    }
+
+    function loadPaymentHistory() {
+      let payments = JSON.parse(localStorage.getItem('portal_payments_db') || '[]');
+      const tbody = document.getElementById('paymentHistoryTable');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const userPayments = payments.filter(p => p.userEmail === loggedInUserEmail);
+      if (userPayments.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#64748b;">কোনো পেমেন্ট হিস্টোরি পাওয়া যায়নি।</td></tr>';
+        return;
+      }
+
+      const now = Date.now();
+      let updatedList = false;
+
+      userPayments.forEach(p => {
+        if (p.status === 'Pending' && now >= p.autoApproveTime && !p.balanceAdded) {
+          p.status = 'Approved (Auto)';
+          p.balanceAdded = true;
+          updateUserBalance(p.userEmail, p.amount);
+          updatedList = true;
+        }
+
+        let statusHtml = '';
+        if (p.status.includes('Approved')) {
+          statusHtml = `<span style="color:#10b981; font-weight:bold;">অনুমোদিত ✅</span>`;
+        } else if (p.status === 'Rejected') {
+          statusHtml = `<span style="color:#ef4444; font-weight:bold;">বাতিল ❌</span>`;
+        } else {
+          const remTime = Math.max(0, Math.floor((p.autoApproveTime - now) / 1000));
+          const mins = Math.floor(remTime / 60);
+          const secs = remTime % 60;
+          statusHtml = `<span style="color:#f97316; font-weight:bold;">অপেক্ষমাণ ⏱ (${mins}মি ${secs}সে)</span>`;
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${p.method}</strong><br><span style="font-size:11px; color:#64748b;">${p.senderNo}</span></td>
+            <td><strong>${convertToBanglaDigits(p.amount)} ৳</strong></td>
+            <td>${p.trxId}</td>
+            <td>${statusHtml}</td>
+            <td><button class="btn-user-delete" onclick="deletePaymentHistory(${p.id})">🗑️</button></td>
+          </tr>
+        `;
+      });
+
+      if (updatedList) localStorage.setItem('portal_payments_db', JSON.stringify(payments));
+    }
+
+    function deletePaymentHistory(id) {
+      if (confirm('আপনি কি এই পেমেন্ট হিস্টোরি রেকর্ডটি ডিলিট করতে চান?')) {
+        let payments = JSON.parse(localStorage.getItem('portal_payments_db') || '[]');
+        payments = payments.filter(p => p.id !== id);
+        localStorage.setItem('portal_payments_db', JSON.stringify(payments));
+        loadPaymentHistory();
+      }
+    }
+
+    function showRegister() {
+      document.getElementById('loginBox').style.display = 'none';
+      document.getElementById('registerBox').style.display = 'flex';
+    }
+
+    function showLogin() {
+      document.getElementById('registerBox').style.display = 'none';
+      document.getElementById('loginBox').style.display = 'flex';
+    }
+
+    function generateUniqueUserId() { return 'SB-' + Math.floor(1000 + Math.random() * 9000); }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('regUser').value.trim();
+      const email = document.getElementById('regEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('regPass').value.trim();
+      if(!email || !pass || !name) return;
+
+      let users = JSON.parse(localStorage.getItem('portal_users_db') || '{}');
+      if(users[email]) { alert('এই ইমেইলটি দিয়ে ইতিমধ্যে রেজিস্ট্রেশন করা আছে!'); return; }
+      const generatedId = generateUniqueUserId();
+      users[email] = { name: name, pass: pass, userId: generatedId, isBlocked: false };
+      localStorage.setItem('portal_users_db', JSON.stringify(users));
+      alert(`রেজিস্ট্রেশন সফল হয়েছে!\nইউজার আইডি: ${generatedId}`);
+      showLogin();
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const inputVal = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const pass = document.getElementById('loginPass').value.trim();
+
+      let users = JSON.parse(localStorage.getItem('portal_users_db') || '{}');
+      let matchedEmail = null;
+      let matchedUser = null;
+
+      if (inputVal === 'user@gmail.com' && pass === '123456') {
+        matchedEmail = 'user@gmail.com';
+        matchedUser = users['user@gmail.com'] || { name: 'Demo User', userId: 'SB-1001', isBlocked: false };
+      } else {
+        for (let emailKey in users) {
+          const uObj = users[emailKey];
+          if ((emailKey === inputVal || (uObj.userId && uObj.userId.toLowerCase() === inputVal)) && uObj.pass === pass) {
+            matchedEmail = emailKey;
+            matchedUser = uObj;
+            break;
+          }
+        }
+      }
+
+      if (matchedUser) {
+        if (matchedUser.isBlocked === true) {
+          alert('আপনার একাউন্টটি ব্লক করা হয়েছে!');
+          return;
+        }
+
+        loggedInUserEmail = matchedEmail;
+        loggedInUserId = matchedUser.userId || 'SB-1001';
+        localStorage.setItem('portal_active_session', JSON.stringify({ email: matchedEmail, userId: loggedInUserId }));
+        localStorage.setItem('portal_active_service', 'হোম');
+
+        resetAllFormData();
+        renderDashboard();
+      } else {
+        alert('ভুল ইমেইল / ইউজার আইডি বা পাসওয়ার্ড!');
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('portal_active_session');
+      localStorage.removeItem('portal_active_service');
+      loggedInUserEmail = '';
+      loggedInUserId = '';
+      
+      resetAllFormData();
+
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('topHeader').style.display = 'none';
+      document.getElementById('loginBox').style.display = 'flex';
+      document.getElementById('sidebarDrawer').classList.remove('active');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+
+    function previewPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) { 
+          tempUploadedPhoto = e.target.result;
+          document.getElementById('out-photo').src = e.target.result; 
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewSign(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const readerObj = new FileReader();
+        readerObj.onload = function(e) { 
+          tempUploadedSign = e.target.result;
+          document.getElementById('out-sign').src = e.target.result; 
+        }
+        readerObj.readAsDataURL(file);
+      }
+    }
+
+    function previewScPhoto(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('scPhotoPreview').src = e.target.result;
+          tempUploadedPhoto = e.target.result;
+          document.getElementById('out-photo').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewScSign(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const signPrev = document.getElementById('scSignPreview');
+          signPrev.src = e.target.result;
+          signPrev.style.display = 'block';
+          document.getElementById('signPlaceholderText').style.display = 'none';
+          tempUploadedSign = e.target.result;
+          document.getElementById('out-sign').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function getDirectPdfImages(page) {
+      const operatorList = await page.getOperatorList();
+      const extractedImages = [];
+
+      for (let j = 0; j < operatorList.fnArray.length; j++) {
+        if (operatorList.fnArray[j] === pdfjsLib.OPS.paintImageXObject || operatorList.fnArray[j] === pdfjsLib.OPS.paintInlineImageXObject) {
+          const imgName = operatorList.argsArray[j][0];
+          let imgObj = null;
+          try { imgObj = page.objs.get(imgName); } catch(err) {
+            try { imgObj = page.commonObjs.get(imgName); } catch(e){}
+          }
+
+          if (imgObj && imgObj.width > 30 && imgObj.height > 20) {
+            const canvas = document.createElement('canvas');
+            canvas.width = imgObj.width;
+            canvas.height = imgObj.height;
+            const ctx = canvas.getContext('2d');
+            
+            let imgData = ctx.createImageData(imgObj.width, imgObj.height);
+            if (imgObj.data.length === imgObj.width * imgObj.height * 4) {
+              imgData.data.set(imgObj.data);
+            } else if (imgObj.data.length === imgObj.width * imgObj.height * 3) {
+              let jIdx = 0;
+              for (let k = 0; k < imgObj.data.length; k += 3) {
+                imgData.data[jIdx] = imgObj.data[k];
+                imgData.data[jIdx+1] = imgObj.data[k+1];
+                imgData.data[jIdx+2] = imgObj.data[k+2];
+                imgData.data[jIdx+3] = 255;
+                jIdx += 4;
+              }
+            } else {
+              let jIdx = 0;
+              for (let k = 0; k < imgObj.data.length; k++) {
+                let val = imgObj.data[k];
+                imgData.data[jIdx] = val;
+                imgData.data[jIdx+1] = val;
+                imgData.data[jIdx+2] = val;
+                imgData.data[jIdx+3] = 255;
+                jIdx += 4;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            extractedImages.push({
+              url: canvas.toDataURL('image/png'),
+              width: imgObj.width,
+              height: imgObj.height,
+              ratio: imgObj.height / imgObj.width
+            });
+          }
+        }
+      }
+      return extractedImages;
+    }
+
+    async function extractPhotoAndSignOnly(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const loadingEl = document.getElementById('loadingOverlay');
+      document.getElementById('loadingText').innerText = "ছবি ও স্বাক্ষর আলাদা করা হচ্ছে...";
+      loadingEl.style.display = 'flex';
+
+      const fileReader = new FileReader();
+      fileReader.onload = async function() {
+        try {
+          const typedarray = new Uint8Array(this.result);
+          const pdf = await pdfjsLib.getDocument(typedarray).promise;
+
+          let photoUrl = "", signUrl = "";
+          const page = await pdf.getPage(1);
+          const images = await getDirectPdfImages(page);
+          if (images.length > 0) {
+            let photoObj = images.find(img => img.ratio >= 1.05);
+            let signObj = images.find(img => img.ratio < 1.05 || img !== photoObj);
+            if (photoObj) photoUrl = photoObj.url;
+            if (signObj) signUrl = signObj.url;
+          }
+
+          if (!photoUrl || !signUrl) {
+            const viewport = page.getViewport({ scale: 2.0 });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+            if (!photoUrl) {
+              const pCanvas = document.createElement('canvas');
+              pCanvas.width = 180; pCanvas.height = 220;
+              pCanvas.getContext('2d').drawImage(canvas, 30, 30, 220, 260, 0, 0, 180, 220);
+              photoUrl = pCanvas.toDataURL('image/png');
+            }
+
+            if (!signUrl) {
+              const sCanvas = document.createElement('canvas');
+              sCanvas.width = 240; sCanvas.height = 120;
+              sCanvas.getContext('2d').drawImage(canvas, 600, 30, 350, 200, 0, 0, 240, 120);
+              signUrl = sCanvas.toDataURL('image/png');
+            }
+          }
+
+          document.getElementById('extPhotoPreview').src = photoUrl;
+          document.getElementById('btnDownloadPhoto').href = photoUrl;
+          document.getElementById('extSignPreview').src = signUrl;
+          document.getElementById('btnDownloadSign').href = signUrl;
+
+          document.getElementById('extractResultArea').style.display = 'flex';
+          setTimeout(() => { loadingEl.style.display = 'none'; }, 500);
+
+        } catch (err) {
+          console.error("Extraction error", err);
+          loadingEl.style.display = 'none';
+        }
+      };
+      fileReader.readAsArrayBuffer(file);
+    }
+
+    async function handlePdfAutoFill(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const loadingEl = document.getElementById('loadingOverlay');
+      document.getElementById('loadingText').innerText = "Python সার্ভার দিয়ে PDF প্রসেসিং ও ডাটা ফিলিং হচ্ছে...";
+      loadingEl.style.display = 'flex';
+
+      try {
+        if (!file.type.includes('pdf')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            tempUploadedPhoto = e.target.result;
+            document.getElementById('scPhotoPreview').src = e.target.result;
+            document.getElementById('out-photo').src = e.target.result;
+            loadingEl.style.display = 'none';
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('pdf', file);
+
+        const response = await fetch('http://127.0.0.1:5000/parse-pdf', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) throw new Error('Python backend response error');
+
+        const data = await response.json();
+        const fullText = data.full_text || "";
+        let rawLines = fullText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+        const fileReader = new FileReader();
+        fileReader.onload = async function() {
+          try {
+            const typedarray = new Uint8Array(this.result);
+            const pdf = await pdfjsLib.getDocument(typedarray).promise;
+            const page1 = await pdf.getPage(1);
+            let photoUrl = "", signUrl = "";
+
+            const images = await getDirectPdfImages(page1);
+            if (images.length > 0) {
+              let photoObj = images.find(img => img.ratio >= 1.05);
+              let signObj = images.find(img => img.ratio < 1.05 || img !== photoObj);
+              if (photoObj) photoUrl = photoObj.url;
+              if (signObj) signUrl = signObj.url;
+            }
+
+            if (!photoUrl || !signUrl) {
+              const viewport = page1.getViewport({ scale: 2.0 });
+              const canvas = document.createElement('canvas');
+              const context = canvas.getContext('2d');
+              canvas.height = viewport.height;
+              canvas.width = viewport.width;
+
+              await page1.render({ canvasContext: context, viewport: viewport }).promise;
+
+              if (!photoUrl) {
+                const pCanvas = document.createElement('canvas');
+                pCanvas.width = 180; pCanvas.height = 220;
+                pCanvas.getContext('2d').drawImage(canvas, 30, 30, 220, 260, 0, 0, 180, 220);
+                photoUrl = pCanvas.toDataURL('image/png');
+              }
+
+              if (!signUrl) {
+                const sCanvas = document.createElement('canvas');
+                sCanvas.width = 240; sCanvas.height = 120;
+                sCanvas.getContext('2d').drawImage(canvas, 600, 30, 350, 200, 0, 0, 240, 120);
+                signUrl = sCanvas.toDataURL('image/png');
+              }
+            }
+
+            if (photoUrl) {
+              tempUploadedPhoto = photoUrl;
+              document.getElementById('scPhotoPreview').src = photoUrl;
+              document.getElementById('out-photo').src = photoUrl;
+            }
+
+            if (signUrl) {
+              tempUploadedSign = signUrl;
+              const signPrev = document.getElementById('scSignPreview');
+              signPrev.src = signUrl;
+              signPrev.style.display = 'block';
+              document.getElementById('signPlaceholderText').style.display = 'none';
+              document.getElementById('out-sign').src = signUrl;
+            }
+          } catch(imgErr) {
+            console.error("Image extraction warning:", imgErr);
+          }
+        };
+        fileReader.readAsArrayBuffer(file);
+
+        let nidVal = "", pinVal = "", nameEnVal = "", nameBnVal = "", fatherVal = "", motherVal = "", spouseVal = "", dobVal = "", birthPlaceVal = "", bloodVal = "";
+        let holdingVal = "", villageVal = "", mouzaVal = "", postVal = "", codeVal = "", upozilaVal = "", distVal = "";
+
+        let nidMatch = fullText.match(/National\s*ID\s*[|:]?\s*(\d{10,17})/i);
+        if (nidMatch) nidVal = nidMatch[1];
+
+        let pinMatch = fullText.match(/Pin\s*[|:]?\s*(\d{13,18})/i);
+        if (pinMatch) pinVal = pinMatch[1];
+
+        let dobMatch = fullText.match(/Date\s*of\s*Birth\s*[|:]?\s*(\d{4}-\d{2}-\d{2})/i);
+        if (dobMatch) dobVal = dobMatch[1];
+
+        if (data.extracted_holding) {
+          holdingVal = fixFontBreakage(data.extracted_holding);
+        }
+
+        for (let idx = 0; idx < rawLines.length; idx++) {
+          let line = rawLines[idx];
+
+          if (!nameBnVal && (line.includes("Name(Bangla)") || line.includes("Name Bangla") || line.includes("নাম(বাংলা)"))) {
+            let val = line.replace(/Name\(Bangla\)|Name Bangla|নাম\(বাংলা\)\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            nameBnVal = fixFontBreakage(val);
+          }
+
+          if (!nameEnVal && (line.includes("Name(English)") || line.includes("Name English") || line.includes("নাম(ইংরেজি)"))) {
+            let val = line.replace(/Name\(English\)|Name English|নাম\(ইংরেজি\)\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            nameEnVal = val.replace(/[^A-Za-z\s.-]/g, '').trim();
+          }
+
+          if (!fatherVal && (line.includes("Father Name") || line.includes("পিতার নাম"))) {
+            let val = line.replace(/Father Name|পিতার নাম\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            fatherVal = fixFontBreakage(val);
+          }
+
+          if (!motherVal && (line.includes("Mother Name") || line.includes("মাতার নাম"))) {
+            let val = line.replace(/Mother Name|মাতার নাম\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            motherVal = fixFontBreakage(val);
+          }
+
+          if (!spouseVal && (line.includes("Spouse Name") || line.includes("স্বামী বা স্ত্রীর নাম"))) {
+            let val = line.replace(/Spouse Name|স্বামী বা স্ত্রীর নাম\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            if (val && !val.includes("Gender") && !val.includes("|")) {
+              spouseVal = fixFontBreakage(val);
+            }
+          }
+
+          if (!birthPlaceVal && (line.includes("Birth Place") || line.includes("Birthplace") || line.includes("জন্ম স্থান"))) {
+            let val = line.replace(/Birth Place|Birthplace|জন্মস্থান\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            birthPlaceVal = fixFontBreakage(val);
+          }
+
+          if (!bloodVal && (line.includes("Blood Group") || line.includes("রক্তের গ্রুপ"))) {
+            let val = line.replace(/Blood Group|রক্তের গ্রুপ\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            if (val && val !== "|") bloodVal = val.replace(/[^A-Za-z+-]/g, '').trim();
+          }
+
+          if (!holdingVal && (line.includes("Home/Holding") || line.includes("HomeHolding") || line.includes("হোল্ডিং"))) {
+            let val = line.replace(/Home\s*\/?\s*Holding\s*(No|Num|Number)?|Holding|বাসা\s*\/?\s*হোল্ডিং|Home\/Holding/gi, '').replace(/^[-|:]/, '').trim();
+            if (val && val !== '|' && !val.includes("Postal") && !val.includes("District")) {
+              holdingVal = fixFontBreakage(val);
+            } else {
+              for (let k = 1; k <= 5; k++) {
+                if (idx + k < rawLines.length) {
+                  let cand = rawLines[idx + k].replace(/^[|]/, '').trim();
+                  if (cand && cand !== '|' && !cand.includes("Postal") && !cand.includes("District") && !cand.includes("Union") && !cand.includes("Ward")) {
+                    holdingVal = fixFontBreakage(cand);
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+          if (!villageVal && (line.includes("Village/Road") || line.includes("Village") || line.includes("গ্রাম/রাস্তা"))) {
+            let val = line.replace(/Additional |Village\/Road|VillageRoad|Villages|গ্রাম\/রাস্তা\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            let cleaned = fixFontBreakage(val);
+            if (cleaned && cleaned !== 'NA' && !cleaned.match(/^\d{4}$/)) villageVal = cleaned;
+          }
+
+          if (!mouzaVal && (line.includes("Mouza/Moholla") || line.includes("Mouza") || line.includes("মৌজা/মহল্লা"))) {
+            let val = line.replace(/Additional |Mouza\/Moholla|Mouza|মৌজা\/মহল্লা\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            let cleaned = fixFontBreakage(val);
+            if (cleaned && cleaned !== 'NA' && !cleaned.match(/^\d{4}$/)) mouzaVal = cleaned;
+          }
+
+          if (!postVal && (line.includes("Post Office") || line.includes("Post") || line.includes("ডাকঘর"))) {
+            let val = line.replace(/Post Office|Posts|ডাকঘর\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            let cleaned = fixFontBreakage(val);
+            if (cleaned && cleaned !== 'NA' && !cleaned.match(/^\d{4}$/)) postVal = cleaned;
+          }
+
+          if (!codeVal && (line.includes("Postal Code") || line.includes("পোস্ট কোড"))) {
+            let m = line.match(/\b(3\d{3}|1\d{3}|2\d{3}|4\d{3}|5\d{3}|6\d{3}|7\d{3}|8\d{3})\b/);
+            if (m) {
+              codeVal = m[1];
+            } else if (idx + 1 < rawLines.length) {
+              let nextLine = rawLines[idx + 1].trim();
+              let mNext = nextLine.match(/\b(3\d{3}|1\d{3}|2\d{3}|4\d{3}|5\d{3}|6\d{3}|7\d{3}|8\d{3})\b/);
+              if (mNext) codeVal = mNext[1];
+            }
+          }
+
+          if (!upozilaVal && (line.includes("Upozila") || line.includes("উপজেলা"))) {
+            let val = line.replace(/Upozila|উপজেলা\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            upozilaVal = fixFontBreakage(val);
+          }
+
+          if (!distVal && (line.includes("District") || line.includes("জেলা"))) {
+            let val = line.replace(/District|জেলা\s*[-|:]/gi, '').trim();
+            if ((!val || val === "|") && idx + 1 < rawLines.length) val = rawLines[idx + 1].replace(/^[|]/, '').trim();
+            distVal = fixFontBreakage(val);
+          }
+        }
+
+        if (!codeVal) {
+          let allCodes = fullText.match(/\b(3\d{3}|1\d{3}|2\d{3}|4\d{3}|5\d{3}|6\d{3}|7\d{3}|8\d{3})\b/g);
+          if (allCodes && allCodes.length > 0) {
+            let dobYear = dobVal ? dobVal.split('-')[0] : "";
+            let validCode = allCodes.find(c => c !== dobYear);
+            if (validCode) codeVal = validCode;
+          }
+        }
+
+        document.getElementById('scNameBn').value = nameBnVal;
+        document.getElementById('scNameEn').value = nameEnVal;
+        document.getElementById('scIdNo').value = nidVal;
+        document.getElementById('scPinNo').value = pinVal;
+        document.getElementById('scFatherName').value = fatherVal;
+        document.getElementById('scMotherName').value = motherVal;
+        document.getElementById('scSpouseName').value = spouseVal;
+        document.getElementById('scBirthPlace').value = birthPlaceVal;
+        if (dobVal) document.getElementById('scDob').value = formatDateToDDMonYYYY(dobVal);
+        if (bloodVal) document.getElementById('scBloodGroup').value = bloodVal;
+
+        let formattedCodeVal = codeVal ? convertToBanglaDigits(codeVal) : '';
+        let addressParts = [];
+
+        let cleanHolding = holdingVal ? fixFontBreakage(holdingVal) : '';
+        if (cleanHolding && cleanHolding !== 'NA' && cleanHolding !== 'N/A' && cleanHolding !== '-') {
+          addressParts.push(`বাসা/হোল্ডিং: ${cleanHolding}`);
+        } else {
+          addressParts.push(`বাসা/হোল্ডিং: -`);
+        }
+
+        let cleanVillage = villageVal ? fixFontBreakage(villageVal) : '';
+        if (cleanVillage && cleanVillage !== 'NA') addressParts.push(`গ্রাম/রাস্তা: ${cleanVillage}`);
+
+        if (mouzaVal && mouzaVal !== 'NA' && mouzaVal !== villageVal) {
+          addressParts.push(fixFontBreakage(mouzaVal));
+        }
+
+        let pStr = (postVal && postVal !== 'NA') ? fixFontBreakage(postVal) : '';
+        let cStr = formattedCodeVal ? ` - ${formattedCodeVal}` : '';
+        if (pStr || cStr) addressParts.push(`ডাকঘর: ${pStr}${cStr}`);
+
+        if (upozilaVal) addressParts.push(fixFontBreakage(upozilaVal));
+        if (distVal) addressParts.push(fixFontBreakage(distVal));
+
+        document.getElementById('scAddress').value = addressParts.join(', ');
+
+        setTimeout(() => { loadingEl.style.display = 'none'; }, 400);
+
+      } catch (err) {
+        console.error("Python Server PDF Parsing error:", err);
+        alert('Python সার্ভার থেকে ডাটা আনতে সমস্যা হয়েছে।');
+        loadingEl.style.display = 'none';
+      }
+    }
+
+    function handleSignCopySubmit(e) {
+      e.preventDefault();
+      const userBal = getUserBalance(loggedInUserEmail);
+      if (userBal < 2) {
+        alert('আপনার ব্যালেন্স পর্যাপ্ত নেই! NID ডাউনলোড করার জন্য অন্তত ২ টাকা লাগবে।');
+        return;
+      }
+
+      const nidNo = document.getElementById('scIdNo').value;
+      const dob = document.getElementById('scDob').value;
+      const nameBn = document.getElementById('scNameBn').value;
+      const nameEn = document.getElementById('scNameEn').value;
+      const fatherName = document.getElementById('scFatherName').value;
+      const motherName = document.getElementById('scMotherName').value;
+      const birthPlace = document.getElementById('scBirthPlace').value;
+      const issueDate = document.getElementById('scIssueDate').value;
+      const bloodGroup = document.getElementById('scBloodGroup').value;
+      const address = document.getElementById('scAddress').value;
+
+      updateUserBalance(loggedInUserEmail, -2);
+
+      const historyRecord = {
+        id: editingManualRecordId ? editingManualRecordId : Date.now(),
+        userEmail: loggedInUserEmail,
+        nidNo: nidNo,
+        oldNidNo: document.getElementById('scPinNo').value,
+        dob: dob,
+        nameBn: nameBn,
+        nameEn: nameEn,
+        fatherName: fatherName,
+        motherName: motherName,
+        birthPlace: birthPlace,
+        issueDate: issueDate,
+        bloodGroup: bloodGroup,
+        address: address,
+        photo: tempUploadedPhoto || document.getElementById('out-photo').src || '',
+        sign: tempUploadedSign || document.getElementById('out-sign').src || ''
+      };
+
+      let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+      if (editingManualRecordId) {
+        const index = historyList.findIndex(h => h.id === editingManualRecordId);
+        if (index !== -1) historyList[index] = historyRecord;
+        else historyList.unshift(historyRecord);
+      } else {
+        historyList.unshift(historyRecord);
+      }
+      localStorage.setItem('portal_manual_history', JSON.stringify(historyList));
+      editingManualRecordId = null;
+
+      selectService('এনআইডি হিস্টোরি');
+      triggerNidPrint(historyRecord);
+    }
+
+    function generatePDF417Barcode(pinNo, nameEnText, dobText) {
+      try {
+        const barcodeData = `<pin>${pinNo || ''}</pin><name>${nameEnText || ''}</name><DOB>${dobText || ''}</DOB><FP></FP><F>Right Index</F><TYPE></TYPE><V>2.0</V>`;
+        bwipjs.toCanvas('pdf417-barcode', { bcid: 'pdf417', text: barcodeData, scale: 3, height: 12, includetext: false });
+      } catch (e) { console.error('Barcode error', e); }
+    }
+
+    function handleManualDirectDownload(e) {
+      e.preventDefault();
+      const nidNo = document.getElementById('nidNo').value;
+      const oldNidNo = document.getElementById('oldNidNo').value;
+      const dob = document.getElementById('dob').value;
+      const nameBn = document.getElementById('nameBn').value;
+      const nameEn = document.getElementById('nameEn').value;
+      const fatherName = document.getElementById('fatherName').value;
+      const motherName = document.getElementById('motherName').value;
+      const birthPlace = document.getElementById('birthPlace').value;
+      const issueDateRaw = document.getElementById('issueDate').value;
+      const bloodGroup = document.getElementById('bloodGroup').value;
+      const address = document.getElementById('address').value;
+
+      const formattedIssueDate = convertToBanglaDigits(issueDateRaw);
+
+      const historyRecord = {
+        id: editingManualRecordId ? editingManualRecordId : Date.now(),
+        userEmail: loggedInUserEmail,
+        nidNo: nidNo,
+        oldNidNo: oldNidNo,
+        dob: dob,
+        nameBn: nameBn,
+        nameEn: nameEn,
+        fatherName: fatherName,
+        motherName: motherName,
+        birthPlace: birthPlace,
+        issueDate: formattedIssueDate,
+        bloodGroup: bloodGroup,
+        address: address,
+        photo: tempUploadedPhoto || document.getElementById('out-photo').src || '',
+        sign: tempUploadedSign || document.getElementById('out-sign').src || ''
+      };
+
+      let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+      if (editingManualRecordId) {
+        const index = historyList.findIndex(h => h.id === editingManualRecordId);
+        if (index !== -1) historyList[index] = historyRecord;
+        else historyList.unshift(historyRecord);
+      } else {
+        historyList.unshift(historyRecord);
+      }
+      localStorage.setItem('portal_manual_history', JSON.stringify(historyList));
+      editingManualRecordId = null;
+
+      selectService('এনআইডি হিস্টোরি');
+      triggerNidPrint(historyRecord);
+    }
+
+    function triggerNidPrint(data) {
+      document.body.classList.add('printing-nid');
+
+      document.getElementById('out-nameBn').innerText = data.nameBn;
+      document.getElementById('out-nameEn').innerText = data.nameEn;
+      document.getElementById('out-fatherName').innerText = data.fatherName;
+      document.getElementById('out-motherName').innerText = data.motherName;
+      document.getElementById('out-dob').innerText = data.dob;
+      document.getElementById('out-nidNo').innerText = data.nidNo;
+      document.getElementById('out-address').innerText = data.address;
+      document.getElementById('out-bloodGroup').innerText = data.bloodGroup;
+      document.getElementById('out-birthPlace').innerText = data.birthPlace;
+      document.getElementById('out-issueDate').innerText = data.issueDate;
+
+      if(data.photo) document.getElementById('out-photo').src = data.photo;
+      if(data.sign) {
+        const outSign = document.getElementById('out-sign');
+        outSign.src = data.sign;
+      }
+
+      generatePDF417Barcode(data.oldNidNo || data.nidNo, data.nameEn, data.dob);
+
+      const bgImg = new Image();
+      bgImg.src = 'nid-bg.jpg';
+
+      const doPrint = function() {
+        window.print();
+        setTimeout(() => { document.body.classList.remove('printing-nid'); }, 500);
+      };
+
+      bgImg.onload = function() { setTimeout(doPrint, 200); };
+      bgImg.onerror = function() { setTimeout(doPrint, 200); };
+    }
+
+    function reprintManualCard(recordId) {
+      let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+      const target = historyList.find(h => h.id === recordId);
+      if (target) triggerNidPrint(target);
+    }
+
+    function editManualCard(recordId) {
+      let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+      const target = historyList.find(h => h.id === recordId);
+      if (target) {
+        editingManualRecordId = recordId;
+        selectService('এনআইডি ম্যানুয়াল', false);
+        document.getElementById('nidNo').value = target.nidNo || '';
+        document.getElementById('oldNidNo').value = target.oldNidNo || '';
+        document.getElementById('dob').value = target.dob || '';
+        document.getElementById('nameBn').value = target.nameBn || '';
+        document.getElementById('nameEn').value = target.nameEn || '';
+        document.getElementById('fatherName').value = target.fatherName || '';
+        document.getElementById('motherName').value = target.motherName || '';
+        document.getElementById('birthPlace').value = target.birthPlace || '';
+        document.getElementById('issueDate').value = target.issueDate || '';
+        document.getElementById('bloodGroup').value = target.bloodGroup || '';
+        document.getElementById('address').value = target.address || '';
+
+        if (target.photo) {
+          tempUploadedPhoto = target.photo;
+          document.getElementById('out-photo').src = target.photo;
+        }
+        if (target.sign) {
+          tempUploadedSign = target.sign;
+          document.getElementById('out-sign').src = target.sign;
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function deleteManualHistory(recordId) {
+      if (confirm('আপনি কি সত্যি এই ম্যানুয়াল হিস্টোরিটি ডিলিট করতে চান?')) {
+        let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+        historyList = historyList.filter(h => h.id !== recordId);
+        localStorage.setItem('portal_manual_history', JSON.stringify(historyList));
+        loadManualHistory();
+      }
+    }
+
+    function loadManualHistory() {
+      let historyList = JSON.parse(localStorage.getItem('portal_manual_history') || '[]');
+      const tbody = document.getElementById('manualHistoryTable');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const userHistory = historyList.filter(h => h.userEmail === loggedInUserEmail);
+      if (userHistory.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#64748b;">কোনো ম্যানুয়াল ডাউনলোড হিস্টোরি পাওয়া যায়নি।</td></tr>';
+        return;
+      }
+
+      userHistory.forEach(h => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${h.nameBn}</strong><br><span style="font-size:11px; color:#64748b;">${h.nameEn}</span></td>
+            <td>${h.nidNo}</td>
+            <td>${h.dob}</td>
+            <td>
+              <button class="action-btn-download" onclick="reprintManualCard(${h.id})">প্রিন্ট / ডাউনলোড</button>
+              <button class="action-btn-edit" onclick="editManualCard(${h.id})" title="তথ্য এডিট করুন">✏️</button>
+            </td>
+            <td><button class="btn-user-delete" onclick="deleteManualHistory(${h.id})">🗑️</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    function handleServerCopyRequest(e) {
+      e.preventDefault();
+      const nidNo = document.getElementById('scNidNo').value;
+      const dob = document.getElementById('reqDob').value;
+
+      let reqList = JSON.parse(localStorage.getItem('portal_requests_db') || '[]');
+      const newReq = {
+        id: Date.now(),
+        userEmail: loggedInUserEmail,
+        userId: loggedInUserId,
+        serviceName: 'সার্ভার কপি',
+        nidNo: nidNo,
+        dob: dob,
+        nameEn: '', nameBn: '', fatherName: '', motherName: '', birthPlace: '', issueDate: '', bloodGroup: '', address: '',
+        status: 'Pending', note: '', uploadedFile: null, deletedByUsers: [], timestamp: Date.now() + (5 * 60 * 1000)
+      };
+
+      reqList.unshift(newReq);
+      localStorage.setItem('portal_requests_db', JSON.stringify(reqList));
+      loadUserRequests();
+      alert('সার্ভার কপি আবেদন সফলভাবে সাবমিট হয়েছে!');
+      document.getElementById('serverCopyForm').reset();
+    }
+
+    function downloadAdminFile(reqId) {
+      let reqList = JSON.parse(localStorage.getItem('portal_requests_db') || '[]');
+      const targetReq = reqList.find(r => r.id === reqId);
+
+      if (targetReq && targetReq.uploadedFile) {
+        const fileData = targetReq.uploadedFile;
+        const downloadLink = document.createElement('a');
+        downloadLink.href = fileData;
+        let fileName = `Server_Copy_${targetReq.nidNo || 'Document'}.pdf`;
+        if (fileData.startsWith('data:image/png')) fileName = `Server_Copy_${targetReq.nidNo || 'Document'}.png`;
+        
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      } else {
+        alert('এডমিন প্যানেল থেকে এখনো কোনো ডকুমেন্ট/ফাইল আপলোড করা হয়নি!');
+      }
+    }
+
+    function deleteUserRequest(reqId) {
+      if (confirm('আপনি কি সত্যি এই রিকোয়েস্টটি তালিকা থেকে মুছে ফেলতে চান?')) {
+        let reqList = JSON.parse(localStorage.getItem('portal_requests_db') || '[]');
+        reqList = reqList.map(r => {
+          if (r.id === reqId) {
+            if (!r.deletedByUsers) r.deletedByUsers = [];
+            if (!r.deletedByUsers.includes(loggedInUserEmail)) r.deletedByUsers.push(loggedInUserEmail);
+          }
+          return r;
+        });
+        localStorage.setItem('portal_requests_db', JSON.stringify(reqList));
+        loadUserRequests();
+      }
+    }
+
+    function loadUserRequests() {
+      let reqList = JSON.parse(localStorage.getItem('portal_requests_db') || '[]');
+      const tbody = document.getElementById('userRequestTable');
+      tbody.innerHTML = '';
+
+      const myRequests = reqList.filter(r => r.userEmail === loggedInUserEmail && (!r.deletedByUsers || !r.deletedByUsers.includes(loggedInUserEmail)));
+
+      if (myRequests.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:#64748b;">কোনো আবেদন পাওয়া যায়নি।</td></tr>';
+        return;
+      }
+
+      myRequests.forEach(r => {
+        let actionHtml = '';
+        let combinedStatusHtml = '';
+        const now = Date.now();
+        const diff = r.timestamp - now;
+
+        if (r.status === 'Approved') {
+          actionHtml = `<button class="action-btn-download" onclick="downloadAdminFile(${r.id})">ডাউনলোড</button>`;
+          combinedStatusHtml = `<span style="color:#10b981; font-weight:bold;">অনুমোদিত</span>`;
+        } else if (r.status === 'Rejected') {
+          actionHtml = `<span class="action-btn-cancelled">বাতিল</span>`;
+          combinedStatusHtml = `<span style="color:#ef4444; font-weight:bold; display:block;">বাতিল হয়েছে</span><span style="color:#64748b; font-size:11px;">নোট: ${r.note || 'প্রযোজ্য নয়'}</span>`;
+        } else {
+          actionHtml = `<span class="action-btn-pending">অপেক্ষমাণ</span>`;
+          if (diff > 0) {
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            combinedStatusHtml = `<span style="color:#f97316; font-weight:bold;">অপেক্ষমাণ</span><span style="font-size:11px; color:#475569;">⏱ ${mins}মি ${secs}সে বাকি</span>`;
+          } else {
+            combinedStatusHtml = `<span style="color:#f97316; font-weight:bold;">অপেক্ষমাণ</span><span style="font-size:11px; color:#ef4444;">⏱ সময় শেষ</span>`;
+          }
+        }
+
+        tbody.innerHTML += `
+          <tr>
+            <td>${r.nidNo}</td>
+            <td>${r.dob}</td>
+            <td>${combinedStatusHtml}</td>
+            <td>${actionHtml}</td>
+            <td><button class="btn-user-delete" title="ডিলিট" onclick="deleteUserRequest(${r.id})">🗑️</button></td>
+          </tr>
+        `;
+      });
+    }
+
+    setInterval(() => {
+      if(document.getElementById('serverCopyFormBox').classList.contains('active')) loadUserRequests();
+      if(document.getElementById('autoPaymentFormBox').classList.contains('active')) loadPaymentHistory();
+    }, 1000);
+  </script>
+</body>
+</html>

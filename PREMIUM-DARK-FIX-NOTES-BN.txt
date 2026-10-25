@@ -1,0 +1,7 @@
+Sheba Computer Academy — Premium Dark CSS Fix
+
+এই ZIP-এ index.html, home.html ও admin.html-এ dark theme inline করা হয়েছে, যাতে style.css load না হলেও UI পুরোপুরি browser default হয়ে না যায়। style.css-এও একই theme যুক্ত করা হয়েছে।
+
+Render deploy: root directory-তে render.yaml, app.py, requirements.txt, index.html, home.html, admin.html, script.js, style.css এবং image files রাখুন।
+
+নোট: এটি UI/CSS recovery patch। Live server, login, payment, database এবং সব feature বাস্তবে পরীক্ষা করা হয়নি। আগের ফাইলের backup রাখুন।
